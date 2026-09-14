@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CHI Host Business Enrollment</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
 </head>
 <body>
 <style>
@@ -15,6 +14,7 @@
   --font:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --mono:"Poppins",system-ui,sans-serif;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{color-scheme:light}
 body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.55 var(--font);padding-inline:16px;padding-block:0 96px;border-top:10px solid var(--accent)}
 .wrap{max-width:760px;margin:0 auto}
@@ -121,6 +121,10 @@ footer.nav .spacer{flex:1;color:var(--muted);font-size:13px}
 .later-card h3{margin:0;font-size:18px}
 .later-card p{margin:0;font-size:14px}
 .later-card a.btn{text-decoration:none;display:inline-block}
+.later-card .addrow{gap:8px}
+.later-card ol.plain{margin:0 0 12px 0;padding-left:22px}
+.later-card ol.plain li{margin:0 0 6px 0;line-height:1.5}
+.later-card #selfUrl{margin:0 0 8px 0;word-break:break-all}
 footer.nav #laterBtn{font-size:13px;padding:8px 12px}
 @media (max-width:520px){footer.nav .spacer{display:none}}
 @media print{
@@ -148,20 +152,31 @@ footer.nav #laterBtn{font-size:13px;padding:8px 12px}
 <footer class="nav"><div class="inner">
   <button class="btn quiet" id="backBtn" type="button">Back</button>
   <div class="spacer" id="saveNote"></div>
-  <button class="btn quiet" id="laterBtn" type="button">Save and continue later</button>
+  <button class="btn quiet" id="laterBtn" type="button">Save my progress</button>
   <button class="btn" id="nextBtn" type="button">Next</button>
 </div></footer>
 <div id="laterBox" class="later" hidden>
   <div class="later-card">
-    <h3>Continue later</h3>
-    <p>Your answers are packed into the link below. Email it to yourself, or to a colleague who needs to fill in a piece, and open it on any device to pick up exactly where you left off. Nothing is sent to CHI until you press Submit.</p>
-    <input type="text" id="laterLink" readonly>
+    <h3>Save your progress</h3>
+    <ol class="plain">
+      <li>Press Download my progress. A file lands in your Downloads folder.</li>
+      <li>To continue later yourself, open this page again and press Open a saved file.</li>
+      <li>To let a coworker fill in a section, email them two things: the file you just downloaded, and this web address.</li>
+    </ol>
+    <p class="addr" id="selfUrl"></p>
     <div class="addrow">
-      <a class="btn" id="laterMail" href="#">Email the link to me</a>
-      <button class="btn secondary" type="button" id="laterCopy">Copy the link</button>
+      <button class="btn quiet" type="button" id="copyUrlBtn">Copy the link</button>
+    </div>
+    <p class="help" id="urlNote"></p>
+    <p>Your coworker opens the address, presses Open a saved file, chooses the file you sent, and picks up where you stopped. When they finish, they download the file again and send it back to you, or they press Submit application themselves.</p>
+    <p>Nothing reaches CHI until someone presses Submit application.</p>
+    <div class="addrow">
+      <button class="btn" type="button" id="saveFileBtn">Download my progress</button>
+      <button class="btn secondary" type="button" id="openFileBtn">Open a saved file</button>
       <button class="btn quiet" type="button" id="laterClose">Close</button>
     </div>
-    <p class="help" id="laterNote"></p>
+    <input type="file" id="openFileInput" accept=".json,application/json" hidden>
+    <p class="help" id="laterNote">Your answers also save automatically on this device.</p>
   </div>
 </div>
 <form id="gform" method="POST" target="gframe" hidden></form>
@@ -184,7 +199,8 @@ const CONFIG = {
     json:     "entry.1269607873"
   },
   chiEmail: "chijennifer@chinet.org",
-  dropboxUrl: "https://www.dropbox.com/request/mbx7eahvvpjl7x3183dt"
+  dropboxUrl: "https://www.dropbox.com/request/mbx7eahvvpjl7x3183dt",
+  fallbackUrl: "https://chijennifer-sys.github.io/host-enrollment/"
 };
 
 const STATES = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming","District of Columbia"];
@@ -353,8 +369,6 @@ const TIMING_CHOICES = {
   Spring: ["February arrivals (available through mid May)","March arrivals (available through June)","April arrivals (available through early July)"],
   Summer: ["May arrivals (available through late August)","Early June arrivals (available through mid September)","Late June arrivals (available through September 30)"]
 };
-const SEASON_MONTHS = { Winter:{start:[11,12,1],end:[3,4]}, Spring:{start:[2,3,4],end:[5,6,7]}, Summer:{start:[5,6,7],end:[8,9,10]} };
-const SEASON_WINDOW = { Winter:"Participants arrive in December and leave between March 15 and 31.", Spring:"Participants arrive between February and April and leave between mid May and early July.", Summer:"Participants arrive between May and late June and leave between late August and September 30." };
 const TIMING_HELP = { Winter:"Participants arrive December 1 to 16 and stay through March 15 to 31.", Spring:"Spring participants arrive in three groups.", Summer:"Summer participants arrive in three groups." };
 const timingFields = sn => [
   ...(TIMING_CHOICES[sn] ? [{ key:"Groups", type:"checks", label:"Which arrival groups work for your business? Check all that apply.", choices:TIMING_CHOICES[sn], help:TIMING_HELP[sn] }] : [{ type:"note", text:TIMING_HELP[sn] }]),
@@ -401,11 +415,9 @@ function renderField(f, obj, ctx, idPrefix){
     const wrap=el("div",{class:"field"});
     wrap.append(el("div",{class:"q"},f.label), el("p",{class:"addr"},f.text));
     const note=el("p",{class:"help"},"");
-    const body="Certificate holder for the workers compensation certificate of insurance:\n\n"+f.text+"\n\nPlease list this as the certificate holder and send the certificate to chijennifer@chinet.org.";
-    const link=el("a",{class:"btn quiet",href:"#",onclick:e=>{ e.preventDefault(); const to=S.a.P1Email||""; e.target.href="mailto:"+to+"?subject="+encodeURIComponent("CHI certificate holder address")+"&body="+encodeURIComponent(body); window.location.href=e.target.href; }},"Email this to me");
     const addrP=wrap.querySelector(".addr");
     const copy=el("button",{type:"button",class:"btn quiet",onclick:()=>copyText(f.text,()=>{note.textContent="Address copied.";},()=>{note.textContent="The address is selected above. Press Command C or Control C to copy it.";},addrP)},"Copy the address");
-    wrap.append(el("div",{class:"addrow"},link,copy), note);
+    wrap.append(el("div",{class:"addrow"},copy), note);
     return wrap;
   }
   if(f.type==="upload"){ if(!CONFIG.dropboxUrl) return el("span",{hidden:true}); const wrap=el("div",{class:"field"}); if(f.label) wrap.append(el("div",{class:"q"},f.label)); if(f.help) wrap.append(el("p",{class:"help"},f.help)); wrap.append(el("div",{class:"addrow"}, el("a",{class:"btn quiet",href:CONFIG.dropboxUrl,target:"_blank",rel:"noopener"},"Upload documents"))); return wrap; }
@@ -527,10 +539,6 @@ function renderTiming(page){
     const check=()=>{
       const t=S.timing[sn]; const msgs=[];
       if((t.EarliestStart&&t.LatestStart&&t.LatestStart<t.EarliestStart)||(t.EarliestEnd&&t.LatestEnd&&t.LatestEnd<t.EarliestEnd)) msgs.push("A latest date is before its earliest date. Please check the dates.");
-      const mon=v=>v?parseInt(String(v).slice(5,7),10):0;
-      const off=[];
-      [["EarliestStart","start"],["LatestStart","start"],["EarliestEnd","end"],["LatestEnd","end"]].forEach(([k,kind])=>{ const m=mon(t[k]); if(m&&SEASON_MONTHS[sn][kind].indexOf(m)<0) off.push(k); });
-      if(off.length) msgs.push("Some dates fall outside the usual "+sn.toLowerCase()+" window. "+SEASON_WINDOW[sn]+" You can leave them as they are; we will follow up if needed.");
       chk.hidden=!msgs.length; chk.textContent=msgs.join(" ");
     };
     sb.addEventListener("input",check); check();
@@ -595,22 +603,38 @@ function costLines(){
   return out;
 }
 function buildSummary(){
-  const SUM_HIDE=["ControlLocations","OwnPayroll","Replacing","Layoffs","PayrollFreq","PayMethod","BankAccount","PayComments","Notes","UnionYN","Union","UnionDues","UnionFreq","UnionInit","Deductions","Groups","UniformAmount","UniformCostTerms"];
   const lines=[];
-  const section=(p)=>{ const rows=collectPageRows(p,S.a).filter(r=>r[1]&&!SUM_HIDE.includes(r[2])); if(!rows.length) return; lines.push("== "+p.title.toUpperCase()+" =="); rows.forEach(([q,v,k])=>{ lines.push(lab(q)+": "+v); if(k&&k.indexOf("Ack")===0) lines.push(""); }); lines.push(""); };
+  const section=(p)=>{ const rows=collectPageRows(p,S.a).filter(r=>r[1]); if(!rows.length) return; lines.push("== "+p.title.toUpperCase()+" =="); rows.forEach(([q,v,k])=>{ lines.push(lab(q)+": "+v); if(k&&k.indexOf("Ack")===0) lines.push(""); }); lines.push(""); };
   const byId=id=>PAGES.find(p=>p.id===id);
   section(byId("seasons"));
-  lines.push("What you told us about other costs");
+  lines.push("== COSTS ==");
   costLines().forEach(t=>lines.push(t));
   lines.push("");
-  ["business","workerscomp","contacts","compliance","payroll","selection"].forEach(id=>section(byId(id)));
-  const posRows=[];
-  S.positions.forEach((p,i)=>{ const rows=[]; const walkP=fs=>fs.forEach(f=>{ if(f.type==="row") return walkP(f.fields); if(f.showIf&&!f.showIf(p)) return; if(SUM_HIDE.includes(f.key)) return; const v=fmtA(p,f.key); if(v) rows.push(lab(f.label)+": "+v); }); walkP(POS_FIELDS); if(rows.length) posRows.push(["-- "+posName(p,i)+" --", rows]); });
-  if(posRows.length){ lines.push("== POSITIONS =="); posRows.forEach(([h,rows])=>{ lines.push(h); rows.forEach(r=>lines.push(r)); }); lines.push(""); }
+  ["business","workerscomp","contacts","compliance","payroll","onboarding","selection"].forEach(id=>section(byId(id)));
+  lines.push("== LOCATIONS ==");
+  S.locations.forEach((l,i)=>{
+    lines.push("-- "+locName(l,i)+" --");
+    const walkL=fs=>fs.forEach(f=>{ if(f.type==="row") return walkL(f.fields); if(f.showIf&&!f.showIf(l)) return; if(!f.key) return; const v=fmtA(l,f.key); if(v) lines.push(lab(f.dynLabel?f.dynLabel(i):f.label)+": "+v); });
+    walkL(LOC_FIELDS);
+    if(HOUSING_SHOW(l.Housing)) l.housing.forEach((h,j)=>{
+      lines.push("  Housing "+(j+1));
+      const walkH=fs=>fs.forEach(f=>{ if(f.type==="row") return walkH(f.fields); if(f.showIf&&!f.showIf(h)) return; if(!f.key) return; const v=fmtA(h,f.key); if(v) lines.push("  "+lab(f.label)+": "+v); });
+      walkH(HOUSING_FIELDS);
+    });
+    lines.push("");
+  });
+  lines.push("== POSITIONS ==");
+  S.positions.forEach((p,i)=>{
+    lines.push("-- "+posName(p,i)+" --");
+    const walkP=fs=>fs.forEach(f=>{ if(f.type==="row") return walkP(f.fields); if(f.showIf&&!f.showIf(p)) return; if(!f.key) return; const v=fmtA(p,f.key); if(v) lines.push(lab(f.label)+": "+v); });
+    walkP(POS_FIELDS);
+    selectedSeasons().forEach(sn=>{ const n=posTotal(i,sn); if(n) lines.push("  "+sn+": "+n+" participants"); });
+    lines.push("");
+  });
   lines.push("== REQUEST NUMBERS ==");
   selectedSeasons().forEach(sn=>{ lines.push(sn+":"); S.locations.forEach((l,li)=>{ const parts=S.positions.map((p,pi)=>{ const v=cnt(S.grid[sn][li]&&S.grid[sn][li][pi]); return v?posName(p,pi)+" "+v:null; }).filter(Boolean); if(parts.length) lines.push("  "+locName(l,li)+": "+parts.join(", ")); }); });
   lines.push("", "== REQUESTED DATES ==");
-  selectedSeasons().forEach(sn=>{ const tv=S.timing[sn]; const rows=[]; const walk=fs=>fs.forEach(f=>{ if(f.type==="row") return walk(f.fields); if(f.type==="note"||SUM_HIDE.includes(f.key)) return; const v=fmtA(tv,f.key); if(v) rows.push("  "+lab(f.label)+": "+v); }); walk(timingFields(sn)); if(rows.length){ lines.push("", sn+":"); rows.forEach(r=>lines.push(r)); } });
+  selectedSeasons().forEach(sn=>{ const tv=S.timing[sn]; const rows=[]; const walk=fs=>fs.forEach(f=>{ if(f.type==="row") return walk(f.fields); if(f.type==="note"||!f.key) return; const v=fmtA(tv,f.key); if(v) rows.push("  "+lab(f.label)+": "+v); }); walk(timingFields(sn)); if(rows.length){ lines.push("", sn+":"); rows.forEach(r=>lines.push(r)); } });
   lines.push("", "Total participants requested: "+grandTotal());
   return lines.join("\n");
 }
@@ -647,7 +671,7 @@ function renderReview(page){
   const submitBtn=el("button",{type:"button",class:"btn",disabled:probs.length>0,onclick:()=>doSubmit(status,submitBtn)},"Submit application");
   actions.append(submitBtn, el("button",{type:"button",class:"btn quiet",onclick:()=>{ copyText(buildSummary(),()=>{ status.innerHTML=""; status.append(el("p",{class:"note ok"},"Summary copied. Paste it into an email or a document to share with your team for review.")); },()=>showSummary(status)); }},"Copy a summary for your files"), el("button",{type:"button",class:"btn quiet",onclick:()=>window.print()},"Print or save as PDF"));
   page.append(actions,status);
-  if(S.submitted) status.append(el("p",{class:"note ok"},"This enrollment was submitted. You can submit again if you changed something."));
+  if(S.submitted) status.append(el("p",{class:"note ok"},"Your application has been submitted. If you need to make a change, return to the relevant page, update your answer, and submit again."));
 }
 function showSummary(status){ status.innerHTML=""; status.append(el("p",{class:"help"},"Copy the text below to share with your team for review."), el("div",{class:"summarybox"},buildSummary())); }
 function doSubmit(status,btn){
@@ -694,21 +718,39 @@ function validateAll(){
 document.getElementById("nextBtn").addEventListener("click",()=>{ if(!validatePage()) return; if(S.page<PAGES.length-1){ S.page++; render(); } });
 document.getElementById("backBtn").addEventListener("click",()=>{ if(S.page>0){ S.page--; render(); } });
 load();
-(function(){ try{ const m=location.hash.match(/^#d=(.+)$/); if(m&&window.LZString){ const d=JSON.parse(LZString.decompressFromEncodedURIComponent(m[1])); if(d&&d.a){ S=Object.assign(S,d); S.submitted=false; save(); } history.replaceState(null,"",location.pathname+location.search); } }catch(e){} })();
 if(S.page>=PAGES.length) S.page=0;
 render();
-document.getElementById("laterBtn").addEventListener("click",()=>{
-  const box=document.getElementById("laterBox"); const note=document.getElementById("laterNote");
-  if(!window.LZString){ note.textContent="The link tool did not load. Your draft is still saved on this device."; box.hidden=false; return; }
-  const data=LZString.compressToEncodedURIComponent(JSON.stringify({page:S.page,a:S.a,locations:S.locations,positions:S.positions,grid:S.grid}));
-  const link=location.origin+location.pathname+location.search+"#d="+data;
-  document.getElementById("laterLink").value=link;
-  const subject="CHI Host Business Enrollment, continue later"; const body="Open this link on any device to pick up your CHI enrollment where you left off:\n\n"+link;
-  document.getElementById("laterMail").href="mailto:"+(S.a.P1Email||"")+"?subject="+encodeURIComponent(subject)+"&body="+encodeURIComponent(body);
-  note.textContent = link.length>6000 ? "This link is long. If your email program cuts it off, use Copy the link and paste it into a note or document instead." : "Your draft is also saved on this device automatically.";
-  box.hidden=false;
+const draftData=()=>({chi:"host-enrollment",page:S.page,a:S.a,locations:S.locations,positions:S.positions,grid:S.grid,timing:S.timing});
+function draftName(){ const n=(S.a.LegalName||S.a.DBA||"draft").replace(/[^A-Za-z0-9 ]/g,"").trim().slice(0,40)||"draft"; const d=new Date(); const p=x=>String(x).padStart(2,"0"); return "CHI enrollment "+n+" "+d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+".json"; }
+function formUrl(){
+  try{
+    const o=location.origin, p=location.pathname;
+    if(o&&o!=="null"&&/^https?:/.test(o)) return o+p.replace(/index\.html$/,"");
+  }catch(e){}
+  return CONFIG.fallbackUrl;
+}
+document.getElementById("copyUrlBtn").addEventListener("click",()=>{
+  const note=document.getElementById("urlNote"), box=document.getElementById("selfUrl");
+  copyText(formUrl(),()=>{note.textContent="Link copied.";},()=>{note.textContent="The link is selected above. Press Command C or Control C to copy it.";},box);
 });
-document.getElementById("laterCopy").addEventListener("click",()=>{ const i=document.getElementById("laterLink"); i.select(); (navigator.clipboard?navigator.clipboard.writeText(i.value):Promise.reject()).then(()=>{document.getElementById("laterNote").textContent="Link copied.";}).catch(()=>{document.execCommand&&document.execCommand("copy");document.getElementById("laterNote").textContent="Link selected. Press Ctrl+C or Cmd+C to copy it.";}); });
+document.getElementById("laterBtn").addEventListener("click",()=>{ document.getElementById("laterNote").textContent="Your answers also save automatically on this device."; document.getElementById("urlNote").textContent=""; document.getElementById("selfUrl").textContent=formUrl(); document.getElementById("laterBox").hidden=false; });
+document.getElementById("saveFileBtn").addEventListener("click",()=>{
+  const note=document.getElementById("laterNote");
+  try{
+    const blob=new Blob([JSON.stringify(draftData(),null,2)],{type:"application/json"});
+    const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=draftName();
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(()=>URL.revokeObjectURL(url),2000);
+    note.textContent="Saved to your Downloads folder as "+draftName();
+  }catch(e){ note.textContent="This browser would not let the page save a file. Your answers are still saved on this device."; }
+});
+document.getElementById("openFileBtn").addEventListener("click",()=>document.getElementById("openFileInput").click());
+document.getElementById("openFileInput").addEventListener("change",e=>{
+  const f=e.target.files&&e.target.files[0]; const note=document.getElementById("laterNote"); if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ try{ const d=JSON.parse(r.result); if(!d||!d.a) throw new Error("bad"); S=Object.assign(S,d); S.timing=S.timing||{Winter:{},Spring:{},Summer:{}}; S.submitted=false; if(S.page>=PAGES.length||S.page<0) S.page=0; save(); document.getElementById("laterBox").hidden=true; render(); }catch(err){ note.textContent="That file could not be read. Please choose a file you saved from this page."; } };
+  r.onerror=()=>{ note.textContent="That file could not be read. Please choose a file you saved from this page."; };
+  r.readAsText(f); e.target.value="";
+});
 document.getElementById("laterClose").addEventListener("click",()=>{ document.getElementById("laterBox").hidden=true; });
 </script>
 

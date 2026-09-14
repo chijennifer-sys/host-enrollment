@@ -39,6 +39,7 @@ header.top h1{font-size:28px;line-height:1.2;margin:0;font-weight:700;text-wrap:
 .field label.q,.field .q{font-weight:700;line-height:1.35}
 .field .req{color:var(--bad);margin-left:3px}
 .help{color:var(--muted);font-size:14px;line-height:1.5;max-width:66ch;margin:0}
+.help.rule{color:var(--ink);font-weight:700}
 input[type=text],input[type=email],input[type=url],input[type=tel],input[type=number],input[type=date],select,textarea{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line-strong);border-radius:6px;padding:9px 11px;width:100%;max-width:100%}
 textarea{min-height:76px;resize:vertical}
 input[type=number]{max-width:160px;font-family:var(--mono)}
@@ -80,6 +81,7 @@ details.season:not([open]) summary .chev::before{content:"\25BE"}
 .nested{border-left:3px solid var(--accent-soft);padding-left:16px;display:flex;flex-direction:column;gap:18px}
 .nested h4{margin:0;font-size:15px;font-weight:700}
 .addrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.allbtn{font-size:13px;padding:6px 10px;margin-bottom:6px}
 .btn{font:600 15px var(--font);border-radius:8px;padding:10px 16px;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink)}
 .btn.secondary{background:var(--panel);color:var(--accent)}
 .btn.quiet{background:none;border-color:var(--line);color:var(--ink)}
@@ -222,9 +224,11 @@ const R = (key,label,choices,o={}) => Object.assign({key,label,type:"radio",choi
 
 const PAGES = [
  { id:"seasons", title:"Seasons", fields:[
+   { type:"statement", text:"This application takes about 20 minutes. You can stop at any point. Use Save my progress at the bottom of the page to finish later, or to send what you have to a colleague." },
+   { type:"note", text:"It helps to have your EIN, your business license, and your workers compensation certificate on hand, though you can submit the application and send the documents later. You will describe your work sites and your positions first. Near the end, a grid asks how many participants you need at each work site, and then we ask for your arrival and departure dates." },
    { key:"WhichSeasons", type:"seasons", label:"Which seasons are you interested in?", required:true,
      help:"Under Department of State guidelines, a host business may take part in no more than two seasons per year. Each season must fall in a peak period, when you hire extra seasonal staff. The countries and dates under each season are examples, not a full list. They show you roughly when participants arrive and leave, so you can pick the seasons that fit your business. CHI also recruits from other countries, and exact dates change from year to year." },
-   R("Hours32","Can you reliably provide each participant with at least 32 hours of work per week, every week of the placement?",["Yes","No","Not sure, I would like to discuss it"]),
+   R("Hours32","Can you reliably provide each participant with at least 32 hours of work per week, every week of the placement?",["Yes","No","Not sure. I would like to discuss it"]),
    TA("Under32Weeks","Which weeks of your season are usually under 32 hours, and why?",{placeholder:"Opening week is training at 24 hours; the last week of the season drops to 28.",showIf:a=>a.Hours32&&a.Hours32!=="Yes"})
  ]},
  { id:"business", title:"Business", fields:[
@@ -233,14 +237,75 @@ const PAGES = [
    R("TypeOfBusiness","Type of business",["Hotel or resort","Restaurant or bar","Amusement park or attraction","Grocery or retail","Pool or lifeguard management","Concessions or food service contractor","Marina or outdoor recreation","Other"]),
    { key:"StateOfIncorporation", type:"select", label:"State of incorporation", choices:STATES },
    T("EIN","EIN",{help:"Format XX-XXXXXXX. The Department of State requires this to verify every host business.",placeholder:"12-3456789"}),
-   TA("HQAddress","Headquarters or Corporate office address",{help:"The address of your corporate or administrative office. You will enter each work location later in the form."}),
+   TA("HQAddress","Headquarters or corporate office address",{help:"The address of your corporate or administrative office. You will enter each work location later in the form."}),
    T("Website","Website",{type:"url",placeholder:"https://"}),
    TA("SocialMedia","Social media links"),
-   TA("WhyChoose","Why choose your business?",{placeholder:"The American Grill has been a family-run boardwalk restaurant since 1985. Our summer staff come from all over the world and many come back."}),
+   TA("WhyChoose","Why should a participant choose your business?",{placeholder:"The American Grill has been a family-run boardwalk restaurant since 1985. Our summer staff come from all over the world and many come back."}),
    TA("Cultural","What cultural activities or experiences do you offer participants?",{help:"The Summer Work Travel program is a cultural exchange with a work component.",placeholder:"It can be as simple as a staff appreciation day or a pizza party."}),
-   { type:"upload", label:"Business license", help:"The Department of State requires CHI to confirm that every host business is registered and legally operating. Upload your business license or state registration here, or email it to chijennifer@chinet.org." }
+   R("OtherSponsors","Do you work with other J-1 sponsors?",YN,{help:"This is common and does not affect your application. We ask because every participant must be scheduled at least 32 hours per week."}),
+   T("OtherSponsorCount","How many participants do you expect from other sponsors this season?",{type:"number",step:"1",sumLabel:"Participants expected from other sponsors",help:"An estimate is fine.",showIf:a=>a.OtherSponsors==="Yes"}),
  ]},
- { id:"workerscomp", title:"Workers Compensation", fields:[
+ { id:"contacts", title:"Contacts", fields:[
+   { type:"statement", text:"Please identify the staff members CHI and participants will work with. One person may fill all roles. Many businesses assign a single contact, while larger businesses divide these responsibilities." },
+   { type:"group", label:"Point of contact for host agreements", fields:[
+     T("P1Name","Name",{sumLabel:"Primary contact name"}), T("P1Title","Title",{sumLabel:"Primary contact title"}), T("P1Email","Email",{type:"email",required:true,sumLabel:"Primary contact email"}), T("P1Phone","Direct phone",{type:"tel",sumLabel:"Primary contact phone"}) ]},
+   { type:"group", label:"Secondary point of contact", fields:[
+     T("P2Name","Name",{sumLabel:"Secondary contact name"}), T("P2Title","Title",{sumLabel:"Secondary contact title"}), T("P2Phone","Direct phone",{type:"tel",sumLabel:"Secondary contact phone"}), T("P2Email","Email",{type:"email",sumLabel:"Secondary contact email"}) ]},
+   { type:"group", label:"Participant point of contact", fields:[
+     { type:"note", text:"Participants correspond with this staff member before arrival." },
+     R("PCSame","Who is the participant contact?",["Same as the primary contact","Same as the secondary contact","Other"]),
+     { key:"PCEcho", type:"computed", label:"Participant point of contact", showIf:a=>a.PCSame&&a.PCSame!=="Other", compute:(self,a)=>{ const k=a.PCSame==="Same as the primary contact"?["P1Name","P1Title","P1Phone","P1Email"]:["P2Name","P2Title","P2Phone","P2Email"]; return k.map(x=>String(a[x]||"").trim()).filter(Boolean).join(", "); } },
+     T("PCName","Name",{showIf:a=>a.PCSame==="Other",sumLabel:"Participant contact name"}), T("PCTitle","Title",{showIf:a=>a.PCSame==="Other",sumLabel:"Participant contact title"}), T("PCPhone","Direct phone",{type:"tel",showIf:a=>a.PCSame==="Other",sumLabel:"Participant contact phone"}), T("PCEmail","Email",{type:"email",showIf:a=>a.PCSame==="Other",sumLabel:"Participant contact email"}),
+     T("PCWhatsApp","WhatsApp",{type:"tel",help:"Optional. Many employers find it useful for arrival and scheduling.",sumLabel:"Participant contact WhatsApp"}) ]}
+ ]},
+ { id:"compliance", title:"Program Rules", fields:[
+   R("ControlLocations","Do you control every location where participants will work?",YN,{help:"Participants must work at a location you own or operate, and your own managers must supervise them on site. You cannot send them to clean private homes or short-term rentals. You also cannot send them to traveling fairs or events."}),
+   R("OwnPayroll","Do you supervise, schedule, and pay participants directly, on your own payroll?",YN,{help:"Participants must be your employees. They go on your payroll, your managers set their schedules, and your managers supervise them on site. You cannot place them through a staffing agency, a contractor, or a PEO that runs the schedule."}),
+   R("Replacing","Are participants replacing any American workers at these locations?",YN,{help:"We must confirm that participants fill seasonal openings you cannot staff locally. They cannot take jobs from American workers."}),
+   R("Layoffs","Have you had layoffs in the past 120 days, or do you have workers on lockout or strike?",YN,{help:"The Department of State requires sponsors to confirm this at the start of each placement season (22 CFR 62.32). Answer for the positions participants would fill, not for management or other roles. Normal end-of-season staffing cuts do not count. We are asking about unplanned layoffs in the same or similar positions, and about any active labor dispute at your location."}),
+   { key:"AckChanges", type:"ack", label:"Changes to the offer", text:"Program regulations require you to tell CHI about any change to the position, hours, pay or housing you offered (22 CFR 62.32). Contact us as soon as you know a change is coming, so we can prepare you and the participant." },
+   { key:"AckStatus", type:"ack", label:"Immigration status", text:"The Department of State designated CHI as a sponsor under 22 CFR Part 62, and CHI holds each participant's SEVIS record. Your business is the host employer. Only the Department of State controls a participant's immigration status, and a participant is an at-will employee like any other member of your staff. Supervisors may not threaten to send a participant back to their country or have them deported. A statement like that is coercion, even in a moment of frustration. If a participant is not meeting expectations, contact CHI and we will work with you." }
+ ]},
+ { id:"payroll", title:"Payroll", fields:[
+   { key:"AckTaxes", type:"ack", label:"Payroll taxes", text:"Summer Work Travel participants are nonresident aliens for tax purposes. Under Internal Revenue Code sections 3121(b)(19) and 3306(c)(19), their wages are exempt from Social Security and Medicare tax (FICA) and from federal unemployment tax (FUTA) while they are in valid J-1 status and working in their authorized placement. Federal, state, and local income tax withholding still applies. Please confirm the setup with your payroll provider before the first paycheck." },
+   R("PayrollFreq","How often is payroll run?",["Weekly","Biweekly","Semi-monthly","Monthly"]),
+   { key:"PayMethod", type:"checks", label:"How are employees paid? Check all that apply.", choices:["Direct deposit","Paper check","Pay card"], help:"Program regulations require that wages be paid through a documented method such as direct deposit, paper check, or pay card. Cash payment of wages is not permitted. Tips may be paid in cash." },
+   R("BankAccount","Do participants need a US bank account open before their first day?",YN),
+   TA("PayComments","Comments"),
+   R("SSN","Social Security Numbers",["Yes, they can start work and be paid using a placeholder number until the SSN is issued","Yes, they can start work once they show the receipt from their Social Security application","They can start work, but cannot be paid until the SSN is issued","They cannot start work until the SSN is issued"],{help:"Participants may work from the start date on their DS-2019. They cannot apply for a Social Security number until after they arrive, and the card takes about 17 days. Most employers enter a placeholder number in payroll and update it when the card comes. If your payroll system cannot do that, we can only place returning participants who already have a number, which leaves you far fewer candidates."}),
+   TA("Deductions","Do you take any deductions from pay? List each one and the amount",{help:"List every deduction in the job offer. Participants must see it before they accept the position (22 CFR 62.32).",placeholder:"Uniform $25 one time; shuttle $25 per week."}),
+   R("UnionYN","Is any position union?",YN),
+   T("Union","Which positions are union?",{placeholder:"Servers and cooks.",showIf:a=>a.UnionYN==="Yes"}),
+   { type:"row", fields:[ T("UnionDues","Dues amount",{type:"number",step:"0.01",money:true,showIf:a=>a.UnionYN==="Yes"}), R("UnionFreq","Dues frequency",["Weekly","Biweekly","Monthly"],{showIf:a=>a.UnionYN==="Yes"}), T("UnionInit","Initiation fee",{type:"number",step:"0.01",money:true,showIf:a=>a.UnionYN==="Yes"}) ]}
+ ]},
+ { id:"onboarding", title:"Onboarding Requirements", fields:[
+   { key:"AckTerms", type:"ack", label:"Employment terms", text:"Participants are at-will employees, like any other member of your staff. They may take an additional job once CHI has vetted and approved it, as long as it does not interfere with the position you offered. Program regulations do not allow sponsors to block an approved second job or a job change (22 CFR 62.32). A stable, predictable schedule is the single biggest factor in keeping a participant for the full season." },
+   { key:"AckProblems", type:"ack", label:"Problems with a participant", text:"CHI asks both host businesses and participants to commit to the first 30 days, so both sides can work through the cultural adjustment period. If a participant is not meeting expectations, or is facing disciplinary action, contact CHI before you act. Many of these problems are cultural, and we can often talk the participant through them. Report any termination to CHI immediately. Report any emergency affecting a participant's health, safety or welfare immediately as well (22 CFR 62.32)." },
+   R("EVerify","Do you use E-Verify?",YN),
+   R("OnlinePaperwork","Do participants complete new-hire paperwork online before they arrive at your host business?",YN,{help:"Onboarding invitations sent to international email addresses often land in spam folders. Please tell CHI when you send them, so we can confirm participants received them."}),
+   TA("ReportOnArrival","Where and when should participants report on arrival?",{placeholder:"Monday to Friday 9 to 5, employee entrance on Main Street, ask for HR."}),
+   TA("DaysToFirstShift","How many days between arrival and the first scheduled shift?",{placeholder:"Usually 2 to 3 days. Orientation is the first Monday after arrival.",help:"Participants pay their own living expenses from the day they arrive. We tell them in advance how many days to expect before their first paid shift."}),
+   T("TrainingLength","How long is training?",{placeholder:"Two weeks"}),
+   R("TrainingRateDiff","Is the pay rate during training different from the position wage?",YN,{help:"The job offer must state the terms of employment before a participant accepts. That includes any training period and the pay rate during training (22 CFR 62.32)."}),
+   T("TrainingRate","Pay rate during training",{type:"number",step:"0.01",money:true,showIf:a=>a.TrainingRateDiff==="Yes"}),
+   TA("Training","Anything else about training?",{placeholder:"Lifeguards attend Red Cross certification training in the first week, paid at the position wage."}),
+   TA("ConfirmArrival","Must participants contact you to confirm arrival, and how?",{placeholder:"Email HR 4 days before arrival."}),
+   TA("PhoneBreak","Phone policy and break policy",{help:"Workplace norms vary widely between countries. Participants may arrive expecting scheduled breaks or phone access that your business does not allow. We put your policies in the job offer, so a participant who accepts has already agreed to them.",placeholder:"Phones in lockers during shifts. One 30-minute unpaid break on shifts over 6 hours. No additional smoking or vaping breaks."})
+ ]},
+ { id:"selection", title:"Selection", fields:[
+   R("Selection","How would you like to be involved in selection?",["CHI may select my candidates","I will conduct interviews","Send me the video introductions and I will choose"],{help:"CHI screens every candidate before we present them to you. Each one records a short video in English, so you can see their personality and hear how they speak. Placement is competitive. Every candidate has hundreds of jobs to choose from, and most accept the first offer they get. If you interview, finish within one week of receiving candidates to have the best chance at your first choices."}),
+   R("InterviewerChoice","Who will conduct the interviews?",["Point of contact for host agreements","Secondary point of contact","Participant point of contact","Other"],{showIf:a=>a.Selection==="I will conduct interviews"}),
+   { key:"InterviewerEcho", type:"computed", label:"Interviewer", sumLabel:"Interviewer", showIf:a=>a.Selection==="I will conduct interviews"&&a.InterviewerChoice&&a.InterviewerChoice!=="Other", compute:(self,a)=>{ const k={"Point of contact for host agreements":["P1Name","P1Email"],"Secondary point of contact":["P2Name","P2Email"],"Participant point of contact":a.PCSame==="Same as the primary contact"?["P1Name","P1Email"]:(a.PCSame==="Same as the secondary contact"?["P2Name","P2Email"]:["PCName","PCEmail"])}[a.InterviewerChoice]||[]; return k.map(x=>String(a[x]||"").trim()).filter(Boolean).join(", "); } },
+   T("Interviewer","Name",{sumLabel:"Interviewer name",placeholder:"Jessica Smith",showIf:a=>a.Selection==="I will conduct interviews"&&a.InterviewerChoice==="Other"}),
+   T("InterviewerEmail","Email",{type:"email",sumLabel:"Interviewer email",placeholder:"jessica@americangrill.com",showIf:a=>a.Selection==="I will conduct interviews"&&a.InterviewerChoice==="Other"}),
+   T("Platform","Preferred platform",{placeholder:"Zoom, Google Meet, Teams or WhatsApp video",showIf:a=>a.Selection==="I will conduct interviews"})
+ ]},
+ { id:"locations", title:"Location Information", custom:"locations" },
+ { id:"positions", title:"Position Information", custom:"positions" },
+ { id:"grid", title:"Request Numbers", custom:"grid" },
+ { id:"timing", title:"Requested Dates", custom:"timing" },
+ { id:"workerscomp", title:"Required Documents", fields:[
+   { type:"upload", label:"Business license", help:"The Department of State requires CHI to confirm that every host business is registered and legally operating. Upload your business license or state registration here, or email it to chijennifer@chinet.org." },
    T("WCCarrier","Workers compensation carrier",{help:"The Department of State requires CHI to verify workers compensation coverage for every host business (22 CFR 62.32). Your application is not complete until we receive your certificate. If your policy renews during the season, please send us the updated copy. We use it only to confirm that your business is insured and legally operating.",placeholder:"Carrier name"}),
    T("WCPolicy","Policy number"),
    T("WCStart","Coverage start date",{type:"date"}),
@@ -248,70 +313,31 @@ const PAGES = [
    { type:"upload", label:"Workers compensation certificate of insurance", help:"You can upload your certificate here or email it to chijennifer@chinet.org." },
    { type:"address", label:"If your insurance agent asks who to list as the certificate holder:", text:"Cultural Homestay International\n255 West End Avenue\nSan Rafael, CA 94901" }
  ]},
- { id:"contacts", title:"Contacts", fields:[
-   { type:"group", label:"CHI Primary Contact", fields:[
-     T("P1Name","CHI Primary Contact Name"), T("P1Title","CHI Primary Contact Title"), T("P1Email","CHI Primary Contact Email",{type:"email",required:true}), T("P1Phone","CHI Primary Contact Direct Phone",{type:"tel"}) ]},
-   { type:"group", label:"CHI Secondary Contact", fields:[
-     T("P2Name","CHI Secondary Contact Name"), T("P2Title","CHI Secondary Contact Title"), T("P2Phone","CHI Secondary Contact Direct Phone",{type:"tel"}), T("P2Email","CHI Secondary Contact Email",{type:"email"}) ]},
-   { type:"group", label:"Participant Contact", fields:[
-     T("PCName","Participant Contact Name",{help:"This is who student participants should contact."}), T("PCTitle","Participant Contact Title"), T("PCPhone","Participant Contact Direct Phone",{type:"tel"}), T("PCEmail","Participant Contact Email",{type:"email"}),
-     T("PCWhatsApp","Participant Contact WhatsApp",{type:"tel",help:"WhatsApp is optional. Employers whose staff work directly with participants often find it useful for arrival and scheduling."}) ]}
- ]},
- { id:"compliance", title:"Program Rules", fields:[
-   R("ControlLocations","Do you control every location where participants will work?",YN,{help:"Participants must work at a location you own or operate, and your own managers must supervise them on site. You cannot send them to clean private homes or short-term rentals. You also cannot send them to traveling fairs or events."}),
-   R("OwnPayroll","Do you supervise, schedule and pay participants directly, on your own payroll?",YN,{help:"Participants must be your employees. They go on your payroll, your managers set their schedules, and your managers supervise them on site. You cannot place them through a staffing agency, a contractor, or a PEO that runs the schedule."}),
-   R("Replacing","Are participants replacing any American workers at these locations?",YN,{help:"We must confirm that participants fill seasonal openings you cannot staff locally. They cannot take jobs from American workers."}),
-   R("Layoffs","Have you had layoffs in the past 120 days, or do you have workers on lockout or strike?",YN,{help:"The Department of State requires sponsors to confirm this at the start of each placement season (22 CFR 62.32). Answer for the positions participants would fill, not for management or other roles. Normal end-of-season staffing cuts do not count. We are asking about unplanned layoffs in the same or similar positions, and about any active labor dispute at your location."}),
-   { key:"AckTerms", type:"ack", label:"Employment terms", text:"Participants are at-will employees, like any other member of your staff. They may take an additional job once CHI has vetted and approved it, as long as it does not interfere with the position you offered. Program regulations do not allow sponsors to block an approved second job or a job change (22 CFR 62.32). A stable, predictable schedule is the single biggest factor in keeping a participant for the full season." },
-   { key:"AckProblems", type:"ack", label:"Problems with a participant", text:"CHI asks both host businesses and participants to commit to the first 30 days, so both sides can work through the cultural adjustment period. If a participant is not meeting expectations, or is facing disciplinary action, contact CHI before you act. Many of these problems are cultural, and we can often talk the participant through them. Report any termination to CHI immediately. Report any emergency affecting a participant's health, safety or welfare immediately as well (22 CFR 62.32)." },
-   { key:"AckChanges", type:"ack", label:"Changes to the offer", text:"Program regulations require you to tell CHI about any change to the position, hours, pay or housing you offered (22 CFR 62.32). Contact us as soon as you know a change is coming, so we can prepare you and the participant." }
- ]},
- { id:"payroll", title:"Payroll", fields:[
-   R("PayrollFreq","How often is payroll run?",["Weekly","Biweekly","Semi-monthly","Monthly"]),
-   { key:"PayMethod", type:"checks", label:"How are employees paid? Check all that apply.", choices:["Direct deposit","Paper check","Pay card"], help:"Program regulations require that wages be paid through a documented method such as direct deposit, paper check, or pay card. Cash payment of wages is not permitted. Tips may be paid in cash." },
-   R("BankAccount","Do participants need a US bank account open before their first day?",YN),
-   TA("PayComments","Comments:"),
-   R("SSN","Social Security Numbers",["Yes, they can start work and be paid using a placeholder number until the SSN is issued","Yes, they can start work once they show the receipt from their Social Security application","They can start work, but cannot be paid until the SSN is issued","They cannot start work until the SSN is issued"],{help:"Participants may work from the start date on their DS-2019. They cannot apply for a Social Security number until after they arrive, and the card takes about 17 days. Most employers enter a placeholder number in payroll and update it when the card comes. If your payroll system cannot do that, we can only place returning participants who already have a number, which leaves you far fewer candidates."}),
-   TA("Deductions","Do you take any deductions from pay? List each one and the amount.",{help:"List every deduction in the job offer. Participants must see it before they accept the position (22 CFR 62.32).",placeholder:"Uniform $25 one time; shuttle $25 per week."}),
-   R("UnionYN","Is any position union?",YN),
-   T("Union","Which positions are union?",{placeholder:"Servers and cooks.",showIf:a=>a.UnionYN==="Yes"}),
-   { type:"row", fields:[ T("UnionDues","Dues amount",{type:"number",step:"0.01",money:true,showIf:a=>a.UnionYN==="Yes"}), R("UnionFreq","Dues frequency",["Weekly","Biweekly","Monthly"],{showIf:a=>a.UnionYN==="Yes"}), T("UnionInit","Initiation fee",{type:"number",step:"0.01",money:true,showIf:a=>a.UnionYN==="Yes"}) ]}
- ]},
- { id:"onboarding", title:"Onboarding Requirements", fields:[
-   R("EVerify","Do you use E-Verify?",YN),
-   R("OnlinePaperwork","Do participants complete new hire paperwork online before they arrive to your host business?",YN,{help:"Onboarding invitations sent to international email addresses often land in spam folders. Please tell CHI when you send them, so we can confirm participants received them."}),
-   TA("ReportOnArrival","Where and when should participants report on arrival?",{placeholder:"Monday to Friday 9 to 5, employee entrance on Main Street, ask for HR."}),
-   TA("DaysToFirstShift","How many days between arrival and the first scheduled shift?",{placeholder:"Usually 2 to 3 days. Orientation is the first Monday after arrival.",help:"Participants pay their own living expenses from the day they arrive. We tell them in advance how many days to expect before their first paid shift."}),
-   TA("Training","How long is training, is it paid, and at what rate? Include any certification training, such as lifeguard.",{help:"The job offer must state the terms of employment before a participant accepts. That includes any training period and the pay rate during training (22 CFR 62.32).",placeholder:"Two weeks, paid at the full hourly rate. Lifeguard certification is 3 unpaid days before the start date."}),
-   TA("ConfirmArrival","Must participants contact you to confirm arrival, and how?",{placeholder:"Email HR 4 days before arrival."}),
-   TA("PhoneBreak","Phone policy and break policy",{help:"Workplace norms vary widely between countries. Participants may arrive expecting scheduled breaks or phone access that your business does not allow. We put your policies in the job offer, so a participant who accepts has already agreed to them.",placeholder:"Phones in lockers during shifts. One 30-minute unpaid break on shifts over 6 hours. No additional smoking or vaping breaks."})
- ]},
- { id:"selection", title:"Selection", fields:[
-   R("Selection","How would you like to be involved in selection?",["CHI may select my candidates","I will conduct interviews","Send me the video introductions and I will choose"],{help:"CHI screens every candidate before we present them to you. Each one records a short video in English, so you can see their personality and hear how they speak. Placement is competitive. Every candidate has hundreds of jobs to choose from, and most accept the first offer they get. If you interview, finish within one week of receiving candidates to have the best chance at your first choices."}),
-   T("Interviewer","Who will conduct the interviews?",{placeholder:"Jessica Smith",showIf:a=>a.Selection==="I will conduct interviews"}),
-   T("InterviewerEmail","Email",{type:"email",placeholder:"jessica@americangrill.com",showIf:a=>a.Selection==="I will conduct interviews"}),
-   T("Platform","Preferred Platform",{placeholder:"Zoom, Google Meet, Teams or WhatsApp video",showIf:a=>a.Selection==="I will conduct interviews"})
- ]},
- { id:"locations", title:"Location Information", custom:"locations" },
- { id:"positions", title:"Position Information", custom:"positions" },
- { id:"grid", title:"Request Numbers", custom:"grid" },
- { id:"timing", title:"Requested Dates", custom:"timing" },
  { id:"review", title:"Review and submit", custom:"review" }
 ];
 
+const TIMES = (()=>{ const out=[]; for(let h=0;h<24;h++){ for(const m of ["00","30"]){ const ap=h<12?"am":"pm"; const hh=h%12===0?12:h%12; out.push(hh+":"+m+" "+ap); } } return out; })();
+const DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 const LOC_FIELDS = [
   T("Name","Location 1",{placeholder:"The American Grill, Main Street",required:true,dynLabel:i=>"Location "+(i+1)}),
   T("Street","Street address"),
   { type:"row", fields:[ T("City","City"), { key:"State", type:"select", label:"State", choices:STATES }, T("Zip","ZIP",{type:"text"}) ]},
   T("Phone","Business phone number",{type:"tel"}),
-  T("Hours","Operating hours at this location",{help:"Participants cannot work overnight shifts. A shift that runs late, such as a 2 am close, is fine. A shift that runs through the night, such as 11 pm to 7 am, is not allowed (22 CFR 62.32).",placeholder:"6 am to 11 pm, seven days a week."}),
+  { type:"group", label:"Operating hours at this work site", fields:[
+    { type:"row", fields:[
+      { key:"OpenTime", type:"select", label:"Opens", choices:["Open 24 hours"].concat(TIMES) },
+      { key:"CloseTime", type:"select", label:"Closes", choices:TIMES, showIf:l=>l.OpenTime!=="Open 24 hours" }
+    ]},
+    { key:"OpenDays", type:"checks", label:"Which days are you open? Check all that apply.", sumLabel:"Days open", choices:DAYS, allLabel:"Open every day" },
+    { type:"rule", text:"Participants cannot work overnight shifts. A shift that runs late, such as a 2 am close, is fine. A shift that runs through the night, such as 11 pm to 7 am, is not allowed (22 CFR 62.32)." }
+  ]},
   R("HoursChange","Do your operating hours change during the season?",["Same hours all season","Hours change during the season"]),
-  TA("HoursSeason","Describe your operating hours through the season.",{placeholder:"Weekends only until mid June. Seven days a week, 10 am to midnight, mid June through Labor Day. Weekends only in September.",showIf:l=>l.HoursChange==="Hours change during the season"}),
+  TA("HoursSeason","Describe your operating hours through the season",{placeholder:"Weekends only until mid June. Seven days a week, 10 am to midnight, mid June through Labor Day. Weekends only in September.",showIf:l=>l.HoursChange==="Hours change during the season"}),
   R("LocationType","Location type",["Beach town","Mountain resort","City","Suburb","Rural","Amusement park"]),
-  R("ContactChoice","Who is the contact for this location?",["Primary contact","Alternate contact","Participant contact","Someone else"]),
-  { key:"ContactName", type:"computed", label:"Contact for this location", showIf:l=>l.ContactChoice&&l.ContactChoice!=="Someone else", compute:(loc,a)=>({ "Primary contact":a.P1Name, "Alternate contact":a.P2Name, "Participant contact":a.PCName })[loc.ContactChoice]||"" },
-  { type:"row", fields:[ T("OtherName","Name",{showIf:l=>l.ContactChoice==="Someone else"}), T("OtherTitle","Title",{showIf:l=>l.ContactChoice==="Someone else"}) ]},
-  { type:"row", fields:[ T("OtherEmail","Email",{type:"email",showIf:l=>l.ContactChoice==="Someone else"}), T("OtherPhone","Phone",{type:"tel",showIf:l=>l.ContactChoice==="Someone else"}) ]},
+  R("ContactChoice","Who is the contact for this location?",["Primary contact","Secondary contact","Participant contact","Other"]),
+  { key:"ContactName", type:"computed", label:"Contact for this location", showIf:l=>l.ContactChoice&&l.ContactChoice!=="Other", compute:(loc,a)=>({ "Primary contact":a.P1Name, "Secondary contact":a.P2Name, "Participant contact":(a.PCSame==="Same as the primary contact"?a.P1Name:(a.PCSame==="Same as the secondary contact"?a.P2Name:a.PCName)) })[loc.ContactChoice]||"" },
+  { type:"row", fields:[ T("OtherName","Name",{showIf:l=>l.ContactChoice==="Other"}), T("OtherTitle","Title",{showIf:l=>l.ContactChoice==="Other"}) ]},
+  { type:"row", fields:[ T("OtherEmail","Email",{type:"email",showIf:l=>l.ContactChoice==="Other"}), T("OtherPhone","Phone",{type:"tel",showIf:l=>l.ContactChoice==="Other"}) ]},
   R("Housing","Housing arrangement for participants at this location",["We provide it directly","Through a landlord or housing provider we arrange","We recommend options but do not arrange","No housing; participants arrange their own"]),
   TA("Directions","Do you have specific instructions for getting to this location?",{help:"CHI provides general travel guidance from the airport. Use this space for anything specific to your location.",placeholder:"Take the Trailways bus to the East Main Street stop and call the front desk when you arrive. The hotel van will pick you up."})
 ];
@@ -320,15 +346,15 @@ const HOUSING_FIELDS = [
   T("HName","Housing name",{placeholder:"Main Street Apartments, Unit 2"}),
   T("HStreet","Street address"),
   { type:"row", fields:[ T("HCity","City"), { key:"HState", type:"select", label:"State", choices:STATES }, T("HZip","ZIP") ]},
-  R("HContactChoice","Who is the contact for this housing?",["Primary contact","Alternate contact","Participant contact","Landlord"]),
-  { key:"HContactName", type:"computed", label:"Contact for this housing", showIf:h=>h.HContactChoice&&h.HContactChoice!=="Landlord", compute:(h,a)=>({ "Primary contact":a.P1Name, "Alternate contact":a.P2Name, "Participant contact":a.PCName })[h.HContactChoice]||"" },
+  R("HContactChoice","Who is the contact for this housing?",["Primary contact","Secondary contact","Participant contact","Landlord"]),
+  { key:"HContactName", type:"computed", label:"Contact for this housing", showIf:h=>h.HContactChoice&&h.HContactChoice!=="Landlord", compute:(h,a)=>({ "Primary contact":a.P1Name, "Secondary contact":a.P2Name, "Participant contact":(a.PCSame==="Same as the primary contact"?a.P1Name:(a.PCSame==="Same as the secondary contact"?a.P2Name:a.PCName)) })[h.HContactChoice]||"" },
   T("LandlordName","Landlord name",{showIf:h=>h.HContactChoice==="Landlord"}),
   { type:"row", fields:[ T("LandlordPhone","Phone",{type:"tel",showIf:h=>h.HContactChoice==="Landlord"}), T("LandlordEmail","Email",{type:"email",showIf:h=>h.HContactChoice==="Landlord"}) ]},
   R("HType","Type of housing",["House","Apartment","Dormitory","Motel or hotel rooms","Other"]),
   T("PerRoom","Participants per room",{placeholder:"4 per room."}),
   R("SingleGender","Are bedrooms single-gender?",YN),
   R("Beds","What type of beds?",["Single beds","Bunk beds","Other"],{help:"Department of State housing guidance requires a separate bed for each participant."}),
-  T("BedsOther","Describe the beds.",{showIf:h=>h.Beds==="Other"}),
+  T("BedsOther","Describe the beds",{showIf:h=>h.Beds==="Other"}),
   T("Bathrooms","How many bathrooms, and how many people share each?",{placeholder:"2 bathrooms, 4 people each."}),
   R("BathShared","Are bathrooms shared between genders?",YN),
   T("Kitchen","Is there a kitchen? What is in it?",{placeholder:"Full kitchen with stove, fridge, microwave.",showIf:h=>h.HType!=="Motel or hotel rooms"}),
@@ -338,14 +364,23 @@ const HOUSING_FIELDS = [
   R("RentDeducted","Is rent deducted from pay?",YN),
   TA("RentDue","When is rent due, and what is the policy for late payment?",{help:"Tell participants the rent terms, and what happens if they pay late, before they accept the housing."}),
   T("DepositAmount","Deposit amount",{type:"number",step:"0.01",money:true}),
-  { type:"row", fields:[ T("DepositDue","Deposit due date",{placeholder:"On arrival."}), T("DepositTerms","Deposit refund terms",{placeholder:"A $50 cleaning fee is deducted at move-out."}) ]},
-  { key:"Included", type:"checks", label:"What is included with the housing? Check all that apply.", choices:["Kitchen with cookware","Wi-Fi","Electric","Water","Gas or heat","Air conditioning","Coin-operated Washer","Coin-operated Dryer","Free Washer","Free Dryer"] },
-  T("Bring","What must participants bring or buy?",{placeholder:"Twin sheets, towels, pillow."}),
+  { type:"row", fields:[ T("DepositDue","Deposit due date",{placeholder:"On arrival."}), T("DepositTerms","Deposit refund terms",{placeholder:"A $50 cleaning fee is deducted at move out."}) ]},
+  { key:"Included", type:"checks", label:"What is included with the housing? Check all that apply.", sumLabel:"Included with housing", choices:["Kitchen with cookware","Sheets","Pillow","Blanket","Towels","Wi-Fi","Electric","Water","Gas or heat","Air conditioning","Coin-operated washer","Coin-operated dryer","Free washer","Free dryer"] },
+  R("LinenService","How often are linens changed or laundered?",["Weekly","Every two weeks","On request","Provided once at move in, participants launder them"],{showIf:h=>h.HType==="Motel or hotel rooms"}),
+  T("Bring","What must participants bring or buy?",{placeholder:"Cleaning supplies, kitchen basics, a fan."}),
   R("Mandatory","Is housing mandatory?",YN),
   T("Guests","Are overnight guests allowed?",{placeholder:"With advance approval, no more than two nights."}),
-  TA("MoveInOut","Days before the start date participants can move in, and days after the end date they can stay.",{placeholder:"Move in up to 4 days before the start date; stay up to 4 days after the last day of work."}),
+  TA("MoveInOut","How many days before the start date can participants move in, and how many days after the end date can they stay?",{placeholder:"Move in up to 4 days before the start date; stay up to 4 days after the last day of work."}),
+  { type:"group", label:"Move in", fields:[
+    { type:"row", fields:[
+      { key:"CheckInEarliest", type:"select", label:"Earliest check in time", choices:TIMES },
+      { key:"CheckInLatest", type:"select", label:"Latest check in time", choices:TIMES }
+    ]},
+    { key:"ArrivalDays", type:"checks", label:"Which days can participants arrive? Check all that apply.", sumLabel:"Arrival days accepted", choices:DAYS, allLabel:"Any day" }
+  ]},
   T("AfterTermination","If a participant is terminated or resigns, how long may they remain in housing?",{help:"CHI asks for a minimum of 48 hours so participants can make arrangements."})
 ];
+const CERT_TITLE = t => /g[ua]{1,2}rd|swim|water\s*safety|pool\s*attendant|beach\s*patrol|aquatic/i.test(String(t||""));
 const POS_FIELDS = [
   T("Title","Position title",{placeholder:"Line Cook",required:true}),
   R("ScheduleSame","Is the schedule the same each week?",["Same every week","Rotates on a set pattern","Changes week to week"],{help:"A stable, predictable schedule is the number one factor in retaining your participant."}),
@@ -353,13 +388,21 @@ const POS_FIELDS = [
   { type:"upload", label:"Job description" },
   TA("OtherRoles","Will participants in this position also be scheduled in other roles?",{help:"If a participant will regularly work across several roles, list each one here. CHI will combine them into a single Team Member position so participants know the job includes a mix of duties. All roles must appear in the job offer (22 CFR 62.32).",placeholder:"Dishwashing, prep, closing cleanup."}),
   TA("Physical","Physical demands and environment",{placeholder:"Standing 8+ hours, no stools; lifting to 50 lbs; hot kitchen in summer; walk-in coolers at 41°F."}),
-  TA("TestCert","Is a test, license or certification required? What happens if the participant does not pass?",{help:"The job offer must name any test or certification you require. It must also say what happens if a participant does not pass (22 CFR 62.32).",placeholder:"Swim test on arrival; two failures means reassignment to gate attendant at $17.00 per hour."}),
-  T("Wage","Hourly wage before taxes",{type:"number",step:"0.01",money:true,help:"You must pay participants the applicable federal, state, or local minimum wage, or the wage you pay U.S. workers in the same position (22 CFR 62.32)."}),
-  R("Tipped","Is this position tipped?",YN),
-  R("TipsPooled","Are tips pooled?",YN,{showIf:p=>p.Tipped==="Yes"}),
-  TA("Uniform","Uniform requirements",{help:"What you provide, what they bring, including footwear.",placeholder:"We provide shirt and apron. Participant brings black pants and non-slip shoes."}),
+  TA("TestCert","Is a test, license, or certification required? What happens if the participant does not pass?",{help:"The job offer must name any test or certification you require. It must also say what happens if a participant does not pass (22 CFR 62.32).",placeholder:"Swim test on arrival; two failures means reassignment to gate attendant at $17.00 per hour."}),
+  R("CertTimePaid","Do you pay participants for time spent in the certification class?",YN,{showIf:p=>CERT_TITLE(p.Title)}),
+  T("CertFee","Are there fees for the course, and who pays them?",{placeholder:"Red Cross course is $185, paid by the business.",showIf:p=>CERT_TITLE(p.Title)}),
+  T("Wage","Hourly wage before taxes",{type:"number",step:"0.01",money:true,help:"You must pay participants the higher of the applicable federal, state, or local minimum wage, or the wage you pay U.S. workers in the same position (22 CFR 62.32)."}),
+  R("Tipped","Is this position tipped?",["No","Yes, tips are kept individually","Yes, tips are pooled"]),
+  TA("TipsDetail","How are tips divided and paid out?",{showIf:p=>/^Yes/.test(p.Tipped||""),placeholder:"Servers tip out 2 percent of sales to bussers and 1 percent to the bar, paid in cash at the end of each shift."}),
+  { key:"UniformItems", type:"checks", label:"What does the business issue? Check all that apply.", choices:["Shirt or top","Pants or shorts","Apron","Hat or visor","Jacket or outerwear","Name tag","Shoes","Swimsuit","Tie","Belt"] },
+  T("ShirtCount","How many shirts are issued?",{type:"number",step:"1",showIf:p=>(p.UniformItems||[]).includes("Shirt or top")}),
+  R("ShoeColor","Shoe color required",["All black, including the sole and logo","Black, any logo is fine","Any dark color","Any color","No requirement"]),
+  R("ShoeSlip","Are non-slip or slip-resistant shoes required?",YN),
+  TA("Uniform","Anything else about the uniform or dress code?"),
   R("UniformCost","Is there a uniform cost to the participant?",YN),
-  { type:"row", fields:[ T("UniformAmount","Uniform cost amount",{type:"number",step:"0.01",money:true,showIf:p=>p.UniformCost==="Yes"}), T("UniformCostTerms","Refund terms",{placeholder:"Deducted from the first paycheck, non-refundable.",showIf:p=>p.UniformCost==="Yes"}) ]},
+  T("UniformAmount","Uniform cost amount",{type:"number",step:"0.01",money:true,showIf:p=>p.UniformCost==="Yes"}),
+  R("UniformCostTerms","How is that cost charged and refunded?",["Deducted from pay, not refunded","Deducted from pay, refunded when the uniform is returned","Participant pays up front, not refunded","Charged as a deposit, refunded at the end of the season","Other"],{showIf:p=>p.UniformCost==="Yes"}),
+  T("UniformCostOther","Please describe",{showIf:p=>p.UniformCost==="Yes"&&p.UniformCostTerms==="Other"}),
   R("Tattoos","Visible tattoos",["Permitted","Must be covered","Not permitted"],{inline:true}),
   R("Piercings","Facial piercings",["Permitted","Not permitted"],{inline:true}),
   R("Beards","Beards",["Permitted","Neatly trimmed only","Not permitted"],{inline:true}),
@@ -369,12 +412,21 @@ const TIMING_CHOICES = {
   Spring: ["February arrivals (available through mid May)","March arrivals (available through June)","April arrivals (available through early July)"],
   Summer: ["May arrivals (available through late August)","Early June arrivals (available through mid September)","Late June arrivals (available through September 30)"]
 };
+const SEASON_RANGE = {
+  Winter: { min:"2027-09-01", max:"2028-07-31" },
+  Spring: { min:"2026-11-01", max:"2027-09-30" },
+  Summer: { min:"2027-01-01", max:"2027-12-31" }
+};
 const TIMING_HELP = { Winter:"Participants arrive December 1 to 16 and stay through March 15 to 31.", Spring:"Spring participants arrive in three groups.", Summer:"Summer participants arrive in three groups." };
 const timingFields = sn => [
-  ...(TIMING_CHOICES[sn] ? [{ key:"Groups", type:"checks", label:"Which arrival groups work for your business? Check all that apply.", choices:TIMING_CHOICES[sn], help:TIMING_HELP[sn] }] : [{ type:"note", text:TIMING_HELP[sn] }]),
-  { type:"row", fields:[ T("EarliestStart","Earliest "+sn.toLowerCase()+" start date",{type:"date"}), T("LatestStart","Latest "+sn.toLowerCase()+" start date",{type:"date"}) ]},
-  { type:"row", fields:[ T("EarliestEnd","Earliest "+sn.toLowerCase()+" end date",{type:"date"}), T("LatestEnd","Latest "+sn.toLowerCase()+" end date",{type:"date"}) ]},
-  TA("Notes","Anything else about arrival or departure dates?",{placeholder:"All lifeguards must arrive by May 15 to attend Red Cross training."})
+  ...(TIMING_CHOICES[sn] ? [{ key:"Groups", type:"checks", label:"Which arrival groups work for your business? Check all that apply.", choices:TIMING_CHOICES[sn], help:TIMING_HELP[sn] }] : [{ type:"statement", text:TIMING_HELP[sn] }]),
+  { type:"group", label:"Start dates", fields:[
+    { type:"row", fields:[ T("EarliestStart","Earliest",{type:"date",sumLabel:"Earliest start date",...SEASON_RANGE[sn]}), T("LatestStart","Latest",{type:"date",sumLabel:"Latest start date",...SEASON_RANGE[sn]}) ]}
+  ]},
+  { type:"group", label:"End dates", fields:[
+    { type:"row", fields:[ T("EarliestEnd","Earliest",{type:"date",sumLabel:"Earliest end date",...SEASON_RANGE[sn]}), T("LatestEnd","Latest",{type:"date",sumLabel:"Latest end date",...SEASON_RANGE[sn]}) ]}
+  ]},
+  TA("Notes","Anything else about arrival or departure dates?",{placeholder:"All lifeguards must arrive two weeks before opening to attend Red Cross training."})
 ];
 
 /* ---------- State ---------- */
@@ -383,13 +435,16 @@ const newHousing = () => ({ Included:[] });
 const newPos = () => ({});
 let S = { page:0, a:{ WhichSeasons:[] }, locations:[newLoc()], positions:[newPos()], grid:{Winter:{},Spring:{},Summer:{}}, timing:{Winter:{},Spring:{},Summer:{}}, submitted:false };
 const KEY="chi-host-enrollment-draft-v1";
-function load(){ try{ const raw=localStorage.getItem(KEY); if(raw){ const d=JSON.parse(raw); if(d&&d.a) S=Object.assign(S,d); } }catch(e){} S.timing=S.timing||{Winter:{},Spring:{},Summer:{}}; }
+const OLD_VALUES={"A different person":"Other","Something else":"Other","Someone else":"Other","Same as the CHI contact":"Same as the primary contact","Same as the backup contact":"Same as the secondary contact","Alternate contact":"Secondary contact"};
+function migrate(o){ if(!o||typeof o!=="object") return; Object.keys(o).forEach(k=>{ const v=o[k]; if(typeof v==="string"){ if(OLD_VALUES[v]) o[k]=OLD_VALUES[v]; } else if(Array.isArray(v)) v.forEach(migrate); else if(v&&typeof v==="object") migrate(v); }); }
+function migrateAll(){ (S.locations||[]).forEach(l=>{ if(Array.isArray(l.ClosedDays)&&!l.OpenDays){ l.OpenDays=DAYS.filter(d=>!l.ClosedDays.includes(d)); } delete l.ClosedDays; }); (S.positions||[]).forEach(p=>{ if(p.Tipped==="Yes"){ p.Tipped=p.TipsPooled==="Yes"?"Yes, tips are pooled":"Yes, tips are kept individually"; } delete p.TipsPooled; }); migrate(S.a); (S.locations||[]).forEach(l=>{ migrate(l); (l.housing||[]).forEach(migrate); }); (S.positions||[]).forEach(migrate); Object.values(S.timing||{}).forEach(migrate); }
+function load(){ try{ const raw=localStorage.getItem(KEY); if(raw){ const d=JSON.parse(raw); if(d&&d.a) S=Object.assign(S,d); } }catch(e){} S.timing=S.timing||{Winter:{},Spring:{},Summer:{}}; migrateAll(); }
 let saveTimer;
 function save(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); document.getElementById("saveNote").textContent="Draft saved on this device"; }catch(e){} },300); }
 const selectedSeasons = () => SEASONS.filter(s=>(S.a.WhichSeasons||[]).includes(s));
 const num = v => { const n=parseFloat(v); return isNaN(n)?0:n; };
 const cnt = v => { const n=parseInt(v,10); return isNaN(n)||n<0?0:n; };
-const posTotal = (pi,season) => { let c=0; const g=S.grid[season]||{}; Object.values(g).forEach(r=>c+=cnt(r&&r[pi])); return c; };
+const posTotal = (pi,season) => { let c=0; const g=S.grid[season]||{}; Object.keys(g).forEach(k=>{ const li=Number(k); if(!(li>=0&&li<S.locations.length)) return; c+=cnt(g[k]&&g[k][pi]); }); return c; };
 const grandTotal = () => S.positions.reduce((t,p,pi)=>t+selectedSeasons().reduce((u,s)=>u+posTotal(pi,s),0),0);
 const locName = (l,i) => (l.Name&&l.Name.trim()) || ("Location "+(i+1));
 const posName = (p,i) => (p.Title&&p.Title.trim()) || ("Position "+(i+1));
@@ -410,6 +465,7 @@ function renderField(f, obj, ctx, idPrefix){
   // f: field def; obj: object holding values; ctx: object passed to showIf/compute; idPrefix: string for ids
   if(f.type==="group"){ const g=el("div",{class:"subsection"}, el("h4",{},f.label)); const box=el("div",{class:"fields"}); f.fields.forEach(x=>box.append(renderField(x,obj,ctx,idPrefix))); g.append(box); return g; }
   if(f.type==="note"){ return el("p",{class:"help"},f.text); }
+  if(f.type==="rule"){ return el("p",{class:"help rule"}, f.lead?el("strong",{},f.lead+" "):null, f.text||""); }
   if(f.type==="statement"){ return el("p",{class:"note info"},f.text); }
   if(f.type==="address"){
     const wrap=el("div",{class:"field"});
@@ -431,12 +487,15 @@ function renderField(f, obj, ctx, idPrefix){
   const q = inputTypes.includes(f.type) ? el("label",Object.assign(qattrs,{for:id}),label) : el("div",qattrs,label);
   if(f.required) q.append(el("span",{class:"req","aria-hidden":"true"},"*"));
   wrap.append(q);
-  if(f.help) wrap.append(el("p",{class:"help"},f.help));
+  if(f.helpLead||f.help) wrap.append(el("p",{class:"help"}, f.helpLead?el("strong",{},f.helpLead+" "):null, f.help||""));
   const set=(v)=>{ obj[f.key]=v; save(); refreshVisibility(); };
   if(f.type==="textarea"){ wrap.append(el("textarea",{id,placeholder:f.placeholder||"",oninput:e=>set(e.target.value)},obj[f.key]||"")); }
   else if(f.type==="select"){ const s=el("select",{id,onchange:e=>set(e.target.value)}, el("option",{value:""},"Select one"), f.choices.map(c=>el("option",{value:c,selected:obj[f.key]===c},c))); wrap.append(s); }
   else if(f.type==="radio"){ const box=el("div",{class:"choices"+(f.inline?" row":"")}); f.choices.forEach((c,i)=>{ const rid=id+"_"+i; box.append(el("label",{class:"choice",for:rid}, el("input",{type:"radio",id:rid,name:id,value:c,checked:obj[f.key]===c,onchange:()=>set(c)}), c)); }); wrap.append(box); }
-  else if(f.type==="checks"){ const box=el("div",{class:"choices"}); const cur=Array.isArray(obj[f.key])?obj[f.key]:[]; f.choices.forEach((c,i)=>{ const cid=id+"_"+i; box.append(el("label",{class:"choice",for:cid}, el("input",{type:"checkbox",id:cid,checked:cur.includes(c),onchange:e=>{ const arr=new Set(Array.isArray(obj[f.key])?obj[f.key]:[]); e.target.checked?arr.add(c):arr.delete(c); set([...arr]); }}), c)); }); wrap.append(box); }
+  else if(f.type==="checks"){ const box=el("div",{class:"choices"}); const cur=Array.isArray(obj[f.key])?obj[f.key]:[]; f.choices.forEach((c,i)=>{ const cid=id+"_"+i; box.append(el("label",{class:"choice",for:cid}, el("input",{type:"checkbox",id:cid,checked:cur.includes(c),onchange:e=>{ const arr=new Set(Array.isArray(obj[f.key])?obj[f.key]:[]); e.target.checked?arr.add(c):arr.delete(c); set([...arr]); }}), c)); }); if(f.allLabel){ const allOn=()=>f.choices.every(c=>(Array.isArray(obj[f.key])?obj[f.key]:[]).includes(c));
+      const btn=el("button",{type:"button",class:"btn quiet allbtn",onclick:()=>{ set(allOn()?[]:f.choices.slice()); render(); }}, allOn()?"Clear all":f.allLabel);
+      wrap.append(el("div",{class:"addrow"},btn)); }
+    wrap.append(box); }
   else if(f.type==="computed"){ const v=f.compute(obj,S.a); obj[f.key]=v; wrap.append(el("input",{type:"text",id,readonly:true,value:v,placeholder:"Filled in from your answer above"})); }
   else if(f.type==="seasons"){
     const box=el("div",{class:"choices"});
@@ -452,7 +511,7 @@ function renderField(f, obj, ctx, idPrefix){
     wrap.append(lim);
     var showLimit=(on)=>{ lim.hidden=!on; };
   }
-  else { const attrs={type:f.type==="text"?"text":f.type,id,placeholder:f.placeholder||"",value:obj[f.key]||"",oninput:e=>set(e.target.value)}; if(f.type==="number"){ attrs.min="0"; attrs.step=f.step||"1"; attrs.inputmode="decimal"; } const inp=el("input",attrs); wrap.append(f.money?el("span",{class:"money-input"}, el("span",{class:"sign"},"$"), inp):inp); }
+  else { const attrs={type:f.type==="text"?"text":f.type,id,placeholder:f.placeholder||"",value:obj[f.key]||"",oninput:e=>set(e.target.value)}; if(f.type==="number"){ attrs.min="0"; attrs.step=f.step||"1"; attrs.inputmode="decimal"; } if(f.min) attrs.min=f.min; if(f.max) attrs.max=f.max; const inp=el("input",attrs); wrap.append(f.money?el("span",{class:"money-input"}, el("span",{class:"sign"},"$"), inp):inp); }
   wrap.append(el("p",{class:"err",hidden:true}));
   wrap._def=f; wrap._obj=obj; wrap._ctx=ctx;
   return wrap;
@@ -493,7 +552,7 @@ function renderLocations(page){
   page.append(el("h2",{id:"pagetitle"},"Location Information"), el("p",{class:"intro"},"Enter your first location below. Additional locations can be added at the bottom of this page."));
   const list=el("div",{class:"fields",id:"loclist"});
   S.locations.forEach((loc,i)=>list.append(renderLocation(loc,i)));
-  page.append(list, el("div",{class:"addrow"}, el("button",{type:"button",class:"btn secondary",onclick:()=>{ S.locations.push(newLoc()); render(); }},"Add another location")));
+  page.append(list, el("div",{class:"addrow"}, el("button",{type:"button",class:"btn secondary",onclick:()=>{ S.locations.push(newLoc()); render(); }},"Add another work site location")));
 }
 function renderLocation(loc,i){
   const item=el("div",{class:"item"});
@@ -530,7 +589,7 @@ function renderPositions(page){
 function renderTiming(page){
   page.append(el("h2",{id:"pagetitle"},"Requested Dates"));
   const seasons=selectedSeasons();
-  if(!seasons.length){ page.append(el("p",{class:"note warn"},"Check at least one season on page 1.")); return; }
+  if(!seasons.length){ page.append(el("p",{class:"note warn"},"Check at least one season on the Seasons page.")); return; }
   seasons.forEach(sn=>{
     const total=S.positions.reduce((t,p,pi)=>t+posTotal(pi,sn),0);
     const sec=el("div",{class:"subsection"}); sec.append(el("h4",{},sn,el("span",{class:"pill"},total+" participant"+(total===1?"":"s"))));
@@ -563,7 +622,7 @@ function renderGrid(page){
       g[li]=g[li]||{};
       const tr=el("tr",{}, el("th",{},locName(l,li)));
       S.positions.forEach((p,pi)=>{
-        const inp=el("input",{type:"number",min:"0",step:"1",inputmode:"numeric","aria-label":posName(p,pi)+" at "+locName(l,li)+", "+sn,value:g[li][pi]??"",oninput:e=>{ let v=(e.target.value.match(/^\d+/)||[""])[0]; if(v!==e.target.value) e.target.value=v; g[li][pi]=v; save(); recalc(); }});
+        const inp=el("input",{type:"number",min:"0",step:"1",inputmode:"numeric","aria-label":posName(p,pi)+" at "+locName(l,li)+", "+sn,value:g[li][pi]??"",oninput:e=>{ let v=(e.target.value.match(/^\d+/)||[""])[0].replace(/^0+(?=\d)/,""); if(v!==e.target.value) e.target.value=v; g[li][pi]=v; save(); recalc(); }});
         tr.append(el("td",{class:"cell"},inp));
       });
       const rt=el("td",{class:"tot"}); rowTotEls.push(rt); tr.append(rt); tb.append(tr);
@@ -586,13 +645,16 @@ function renderGrid(page){
   });
 }
 const lab = l => String(l).replace(/[.:]\s*$/,"");
-function fmtA(a,key){ const v=a[key]; if(Array.isArray(v)) return v.join(", "); return v==null?"":String(v); }
-function collectPageRows(p,obj){ const rows=[]; const walk=fs=>fs.forEach(f=>{ if(f.type==="group"||f.type==="row") return walk(f.fields); if(f.showIf && !f.showIf(obj)) return; if(f.type==="seasons"){ rows.push(["Which seasons are you interested in?",(obj.WhichSeasons||[]).join(", "),"WhichSeasons"]); return; } if(f.type==="ack"){ rows.push([f.label, f.text+"\n"+(obj[f.key]||"Not acknowledged"), f.key]); return; } if(!f.key) return; rows.push([f.label,fmtA(obj,f.key),f.key]); }); walk(p.fields); return rows; }
+const usDate = v => { const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v)); if(!m) return null; const mo=+m[2], d=+m[3]; if(mo<1||mo>12||d<1||d>31) return null; return m[2]+"/"+m[3]+"/"+m[1]; };
+function fmtA(a,key,f){ const v=a[key]; if(Array.isArray(v)) return v.join(", "); if(v==null) return "";
+  if(f&&f.money){ const n=parseFloat(v); if(!isNaN(n)) return "$"+n.toFixed(2); }
+  return usDate(v)||String(v); }
+function collectPageRows(p,obj){ const rows=[]; const walk=fs=>fs.forEach(f=>{ if(f.type==="group"||f.type==="row") return walk(f.fields); if(f.showIf && !f.showIf(obj)) return; if(f.type==="seasons"){ rows.push(["Which seasons are you interested in?",(obj.WhichSeasons||[]).join(", "),"WhichSeasons"]); return; } if(f.type==="ack"){ rows.push([f.label, f.text+"\n"+(obj[f.key]||"Not acknowledged"), f.key]); return; } if(!f.key) return; if(f.type==="computed") obj[f.key]=f.compute(obj,S.a); rows.push([f.sumLabel||f.label,fmtA(obj,f.key,f),f.key]); }); walk(p.fields); return rows; }
 function costLines(){
   const usd=v=>{ const n=parseFloat(v); return isNaN(n)?"":"$"+n.toFixed(2); };
   const freqWord={Weekly:"per week",Biweekly:"every two weeks",Monthly:"per month"};
   const out=[];
-  const uni=S.positions.filter(p=>p.UniformCost==="Yes").map(p=>[usd(p.UniformAmount),p.UniformCostTerms].filter(Boolean).join(", ")).filter(Boolean);
+  const uni=S.positions.filter(p=>p.UniformCost==="Yes").map(p=>[usd(p.UniformAmount),p.UniformCostTerms==="Other"?p.UniformCostOther:p.UniformCostTerms].filter(Boolean).join(", ")).filter(Boolean);
   out.push("Uniform cost: "+(uni.join("; ")||"none"));
   out.push("Union dues and initiation fees: "+(S.a.UnionYN==="Yes" ? ([usd(S.a.UnionDues)&&(usd(S.a.UnionDues)+(S.a.UnionFreq?" "+freqWord[S.a.UnionFreq]:"")), usd(S.a.UnionInit)&&(usd(S.a.UnionInit)+" initiation fee")].filter(Boolean).join(", ")||"amounts not entered") : "none"));
   out.push("Deductions from pay: "+(S.a.Deductions||"none"));
@@ -604,21 +666,35 @@ function costLines(){
 }
 function buildSummary(){
   const lines=[];
-  const section=(p)=>{ const rows=collectPageRows(p,S.a).filter(r=>r[1]); if(!rows.length) return; lines.push("== "+p.title.toUpperCase()+" =="); rows.forEach(([q,v,k])=>{ lines.push(lab(q)+": "+v); if(k&&k.indexOf("Ack")===0) lines.push(""); }); lines.push(""); };
+  const isAck=k=>!!k&&k.indexOf("Ack")===0;
+  const section=(p)=>{ const rows=collectPageRows(p,S.a).filter(r=>r[1]).filter(r=>!isAck(r[2])); if(!rows.length) return; lines.push("== "+p.title.toUpperCase()+" =="); rows.forEach(([q,v])=>lines.push(lab(q)+": "+v)); lines.push(""); };
+  const ACK_ORDER=["AckTerms","AckProblems","AckChanges","AckStatus","AckTaxes"];
+  const rulesSection=()=>{ const cp=byId("compliance");
+    const own=cp?collectPageRows(cp,S.a).filter(r=>r[1]).filter(r=>!isAck(r[2])):[];
+    const acks=[]; PAGES.forEach(p=>{ if(!p.fields) return; collectPageRows(p,S.a).filter(r=>isAck(r[2])).forEach(r=>acks.push(r)); });
+    acks.sort((a,b)=>ACK_ORDER.indexOf(a[2])-ACK_ORDER.indexOf(b[2]));
+    if(!own.length&&!acks.length) return;
+    lines.push("== PROGRAM RULES ==");
+    own.forEach(([q,v])=>lines.push(lab(q)+": "+v));
+    if(own.length&&acks.length) lines.push("");
+    acks.forEach(([q,v])=>{ lines.push(lab(q)+": "+v); lines.push(""); });
+    if(!acks.length) lines.push(""); };
   const byId=id=>PAGES.find(p=>p.id===id);
   section(byId("seasons"));
   lines.push("== COSTS ==");
   costLines().forEach(t=>lines.push(t));
   lines.push("");
-  ["business","workerscomp","contacts","compliance","payroll","onboarding","selection"].forEach(id=>section(byId(id)));
+  ["business","workerscomp","contacts"].forEach(id=>section(byId(id)));
+  rulesSection();
+  ["payroll","onboarding","selection"].forEach(id=>section(byId(id)));
   lines.push("== LOCATIONS ==");
   S.locations.forEach((l,i)=>{
     lines.push("-- "+locName(l,i)+" --");
-    const walkL=fs=>fs.forEach(f=>{ if(f.type==="row") return walkL(f.fields); if(f.showIf&&!f.showIf(l)) return; if(!f.key) return; const v=fmtA(l,f.key); if(v) lines.push(lab(f.dynLabel?f.dynLabel(i):f.label)+": "+v); });
+    const walkL=fs=>fs.forEach(f=>{ if(f.type==="row"||f.type==="group"){ if(f.showIf&&!f.showIf(l)) return; return walkL(f.fields); } if(f.showIf&&!f.showIf(l)) return; if(!f.key) return; const v=fmtA(l,f.key,f); if(v) lines.push(lab(f.sumLabel||(f.dynLabel?f.dynLabel(i):f.label))+": "+v); });
     walkL(LOC_FIELDS);
     if(HOUSING_SHOW(l.Housing)) l.housing.forEach((h,j)=>{
       lines.push("  Housing "+(j+1));
-      const walkH=fs=>fs.forEach(f=>{ if(f.type==="row") return walkH(f.fields); if(f.showIf&&!f.showIf(h)) return; if(!f.key) return; const v=fmtA(h,f.key); if(v) lines.push("  "+lab(f.label)+": "+v); });
+      const walkH=fs=>fs.forEach(f=>{ if(f.type==="row"||f.type==="group"){ if(f.showIf&&!f.showIf(h)) return; return walkH(f.fields); } if(f.showIf&&!f.showIf(h)) return; if(!f.key) return; const v=fmtA(h,f.key,f); if(v) lines.push("  "+lab(f.sumLabel||f.label)+": "+v); });
       walkH(HOUSING_FIELDS);
     });
     lines.push("");
@@ -626,15 +702,15 @@ function buildSummary(){
   lines.push("== POSITIONS ==");
   S.positions.forEach((p,i)=>{
     lines.push("-- "+posName(p,i)+" --");
-    const walkP=fs=>fs.forEach(f=>{ if(f.type==="row") return walkP(f.fields); if(f.showIf&&!f.showIf(p)) return; if(!f.key) return; const v=fmtA(p,f.key); if(v) lines.push(lab(f.label)+": "+v); });
+    const walkP=fs=>fs.forEach(f=>{ if(f.type==="row"||f.type==="group"){ if(f.showIf&&!f.showIf(p)) return; return walkP(f.fields); } if(f.showIf&&!f.showIf(p)) return; if(!f.key) return; const v=fmtA(p,f.key,f); if(v) lines.push(lab(f.sumLabel||f.label)+": "+v); });
     walkP(POS_FIELDS);
-    selectedSeasons().forEach(sn=>{ const n=posTotal(i,sn); if(n) lines.push("  "+sn+": "+n+" participants"); });
+    selectedSeasons().forEach(sn=>{ const n=posTotal(i,sn); if(n) lines.push("  "+sn+": "+n+" participant"+(n===1?"":"s")); });
     lines.push("");
   });
   lines.push("== REQUEST NUMBERS ==");
   selectedSeasons().forEach(sn=>{ lines.push(sn+":"); S.locations.forEach((l,li)=>{ const parts=S.positions.map((p,pi)=>{ const v=cnt(S.grid[sn][li]&&S.grid[sn][li][pi]); return v?posName(p,pi)+" "+v:null; }).filter(Boolean); if(parts.length) lines.push("  "+locName(l,li)+": "+parts.join(", ")); }); });
   lines.push("", "== REQUESTED DATES ==");
-  selectedSeasons().forEach(sn=>{ const tv=S.timing[sn]; const rows=[]; const walk=fs=>fs.forEach(f=>{ if(f.type==="row") return walk(f.fields); if(f.type==="note"||!f.key) return; const v=fmtA(tv,f.key); if(v) rows.push("  "+lab(f.label)+": "+v); }); walk(timingFields(sn)); if(rows.length){ lines.push("", sn+":"); rows.forEach(r=>lines.push(r)); } });
+  selectedSeasons().forEach(sn=>{ const tv=S.timing[sn]; const rows=[]; const walk=fs=>fs.forEach(f=>{ if(f.type==="row"||f.type==="group") return walk(f.fields); if(f.type==="note"||f.type==="statement"||!f.key) return; const v=fmtA(tv,f.key,f); if(v) rows.push("  "+lab(f.sumLabel||f.label)+": "+v); }); walk(timingFields(sn)); if(rows.length){ lines.push("", sn+":"); rows.forEach(r=>lines.push(r)); } });
   lines.push("", "Total participants requested: "+grandTotal());
   return lines.join("\n");
 }
@@ -662,9 +738,19 @@ function renderReview(page){
   const money=el("div",{class:"money"}, el("h3",{},"What you told us about other costs"));
   costLines().forEach(t=>money.append(el("p",{class:"mline"},t)));
   rv.append(money);
-  PAGES.forEach((p,i)=>{ if(p.custom||REVIEW_HIDE_PAGES.includes(p.id)) return; const rows=collectPageRows(p,S.a).filter(r=>r[1]).filter(r=>!REVIEW_HIDE.some(k=>r[2]===k)); if(!rows.length) return; const b=el("div",{class:"block"}, el("button",{type:"button",class:"editlink",onclick:()=>{S.page=i;render();}},"Edit"), el("h4",{},p.title)); const dl=el("dl"); rows.forEach(([q,v])=>dl.append(el("dt",{},q),el("dd",{},v))); b.append(dl); rv.append(b); });
+  const isAckKey=k=>!!k&&k.indexOf("Ack")===0;
+  const ACK_ORDER_R=["AckTerms","AckProblems","AckChanges","AckStatus","AckTaxes"];
+  PAGES.forEach((p,i)=>{
+    if(p.custom||REVIEW_HIDE_PAGES.includes(p.id)) return;
+    let rows=collectPageRows(p,S.a).filter(r=>r[1]).filter(r=>!REVIEW_HIDE.some(k=>r[2]===k)).filter(r=>!isAckKey(r[2]));
+    if(p.id==="compliance"){ const acks=[]; PAGES.forEach(q=>{ if(!q.fields) return; collectPageRows(q,S.a).filter(r=>r[1]&&isAckKey(r[2])).forEach(r=>acks.push(r)); });
+      acks.sort((a,b)=>ACK_ORDER_R.indexOf(a[2])-ACK_ORDER_R.indexOf(b[2])); rows=rows.concat(acks); }
+    if(!rows.length) return;
+    const b=el("div",{class:"block"}, p.id==="compliance"?null:el("button",{type:"button",class:"editlink",onclick:()=>{S.page=i;render();}},"Edit"), el("h4",{},p.title));
+    const dl=el("dl"); rows.forEach(([q,v])=>dl.append(el("dt",{},q),el("dd",{},v)));
+    b.append(dl); rv.append(b); });
   const tb2=el("div",{class:"block"}, el("button",{type:"button",class:"editlink",onclick:()=>{S.page=PAGES.findIndex(p=>p.id==="timing");render();}},"Edit"), el("h4",{},"Requested Dates"));
-  const tdl=el("dl"); selectedSeasons().forEach(sn=>{ const tv=S.timing[sn]; const rows=[]; const walk=fs=>fs.forEach(f=>{ if(f.type==="row") return walk(f.fields); if(f.type==="note"||REVIEW_HIDE.includes(f.key)) return; const v=fmtA(tv,f.key); if(v) rows.push([f.label,v]); }); walk(timingFields(sn)); if(rows.length) tdl.append(el("dt",{},sn),el("dd",{},rows.map(r=>r[0]+" "+r[1]).join("\n"))); }); if(tdl.children.length){ tb2.append(tdl); rv.append(tb2); }
+  const tdl=el("dl"); selectedSeasons().forEach(sn=>{ const tv=S.timing[sn]; const rows=[]; const walk=fs=>fs.forEach(f=>{ if(f.type==="row"||f.type==="group") return walk(f.fields); if(f.type==="note"||f.type==="statement"||REVIEW_HIDE.includes(f.key)) return; const v=fmtA(tv,f.key,f); if(v) rows.push([f.sumLabel||f.label,v]); }); walk(timingFields(sn)); if(rows.length) tdl.append(el("dt",{},sn),el("dd",{},rows.map(r=>r[0]+" "+r[1]).join("\n"))); }); if(tdl.children.length){ tb2.append(tdl); rv.append(tb2); }
   page.append(rv);
   const actions=el("div",{class:"addrow",style:"margin-top:20px"});
   const status=el("div",{id:"submitStatus",style:"width:100%"});
@@ -699,17 +785,17 @@ function validatePage(){
     walk(p.fields);
   } else if(p.custom==="locations"){ S.locations.forEach((l,i)=>{ const msg=String(l.Name||"").trim()?"":"Give this location a name."; markErr("loc"+i+"_Name",msg); if(msg){ok=false; first=first||"loc"+i+"_Name";} }); }
   else if(p.custom==="positions"){ S.positions.forEach((pos,i)=>{ const msg=String(pos.Title||"").trim()?"":"Give this position a title."; markErr("pos"+i+"_Title",msg); if(msg){ok=false; first=first||"pos"+i+"_Title";} }); }
-  if(!ok && first){ const w=document.getElementById("w_"+first); w&&w.scrollIntoView({behavior:"smooth",block:"center"}); }
+  if(!ok && first){ const w=document.getElementById("w_"+first); if(w){ w.scrollIntoView({behavior:"smooth",block:"center"}); const f=w.querySelector("input,select,textarea"); if(f) try{ f.focus({preventScroll:true}); }catch(e){ f.focus(); } } }
   return ok;
 }
 function validateAll(){
   const probs=[];
-  if(!(S.a.WhichSeasons||[]).length) probs.push("Check at least one season on page 1.");
+  if(!(S.a.WhichSeasons||[]).length) probs.push("Check at least one season on the Seasons page.");
   S.locations.forEach((l,i)=>{ if(!String(l.Name||"").trim()) probs.push("Location "+(i+1)+" has no name."); });
   S.positions.forEach((p,i)=>{ if(!String(p.Title||"").trim()) probs.push("Position "+(i+1)+" has no title."); });
-  if(!String(S.a.LegalName||"").trim()) probs.push("Legal business name is missing (page 2).");
-  if(!String(S.a.P1Email||"").trim()) probs.push("CHI Primary Contact Email is missing (page 4).");
-  if(["AckTerms","AckProblems","AckChanges"].some(k=>S.a[k]!=="I understand")) probs.push("The three I understand boxes on Program Rules are not all checked.");
+  if(!String(S.a.LegalName||"").trim()) probs.push("Legal business name is missing on the Business page.");
+  if(!String(S.a.P1Email||"").trim()) probs.push("The email for the primary contact is missing on the Contacts page.");
+  if(["AckTerms","AckProblems","AckChanges","AckStatus","AckTaxes"].some(k=>S.a[k]!=="I understand")) probs.push("The I understand boxes are not all checked. They are on Program Rules, Payroll, and Onboarding Requirements.");
   if(grandTotal()===0) probs.push("No participants requested yet. Enter at least one number on the By location page.");
   return probs;
 }
@@ -747,7 +833,7 @@ document.getElementById("openFileBtn").addEventListener("click",()=>document.get
 document.getElementById("openFileInput").addEventListener("change",e=>{
   const f=e.target.files&&e.target.files[0]; const note=document.getElementById("laterNote"); if(!f) return;
   const r=new FileReader();
-  r.onload=()=>{ try{ const d=JSON.parse(r.result); if(!d||!d.a) throw new Error("bad"); S=Object.assign(S,d); S.timing=S.timing||{Winter:{},Spring:{},Summer:{}}; S.submitted=false; if(S.page>=PAGES.length||S.page<0) S.page=0; save(); document.getElementById("laterBox").hidden=true; render(); }catch(err){ note.textContent="That file could not be read. Please choose a file you saved from this page."; } };
+  r.onload=()=>{ try{ const d=JSON.parse(r.result); if(!d||!d.a) throw new Error("bad"); S=Object.assign(S,d); S.timing=S.timing||{Winter:{},Spring:{},Summer:{}}; migrateAll(); S.submitted=false; if(S.page>=PAGES.length||S.page<0) S.page=0; save(); document.getElementById("laterBox").hidden=true; render(); }catch(err){ note.textContent="That file could not be read. Please choose a file you saved from this page."; } };
   r.onerror=()=>{ note.textContent="That file could not be read. Please choose a file you saved from this page."; };
   r.readAsText(f); e.target.value="";
 });

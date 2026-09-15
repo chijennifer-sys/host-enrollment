@@ -9,8 +9,8 @@
 <body>
 <style>
 :root{
-  --ground:#F8F6F6; --panel:#FFFFFF; --ink:#000000; --muted:#333333; --line:#E2DCDD; --line-strong:#C9C0C2;
-  --accent:#9D2235; --accent-ink:#FFFFFF; --accent-soft:#F7E9EB; --warn:#9A4B00; --warn-soft:#FFF3E3; --ok:#1E6E45; --ok-soft:#E4F3EA; --bad:#A5232A; --bad-soft:#FDE9EA;
+  --ground:#F7F8FA; --panel:#FFFFFF; --ink:#000000; --muted:#334155; --line:#DFE4EA; --line-strong:#9AA6B4;
+  --accent:#3F4C5C; --accent-ink:#FFFFFF; --accent-soft:#EDF0F4; --warn:#9A4B00; --warn-soft:#FFF3E3; --ok:#1E6E45; --ok-soft:#E4F3EA; --bad:#A5232A; --bad-soft:#FDE9EA;
   --font:"Poppins",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --mono:"Poppins",system-ui,sans-serif;
 }
 *{box-sizing:border-box}
@@ -22,15 +22,20 @@ body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.55 var(--fon
 header.top{padding-block:24px 12px;display:grid;grid-template-columns:auto 1fr;gap:6px 18px;align-items:center}
 header.top img{width:82px;height:auto;grid-row:1/3;max-width:100%}
 header.top nav{grid-column:1/3}
-@media (max-width:520px){header.top{grid-template-columns:1fr}header.top img{grid-row:auto;width:70px}header.top nav{grid-column:auto}}
+@media (max-width:520px){header.top{grid-template-columns:1fr}header.top img{grid-row:auto;width:70px}header.top nav{grid-column:auto}header.top .stepnote{grid-column:auto}}
 header.top .eyebrow{font-size:13px;color:var(--ink);font-weight:500}
 header.top h1{font-size:28px;line-height:1.2;margin:0;font-weight:700;text-wrap:balance;color:var(--ink)}
 .steps{display:flex;gap:6px;flex-wrap:wrap;margin-block:10px 20px}
 .steps button{border:1px solid var(--line);background:var(--panel);color:var(--muted);font:600 12px/1 var(--font);padding:8px 10px;border-radius:999px;cursor:pointer}
-.steps button.done{border-color:var(--accent);color:var(--accent)}
+.steps button.part{border-color:var(--accent);color:var(--accent)}
+.steps button.ok{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+.steps button.cur{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.steps button.cur.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.steps button .tick{margin-left:5px;font-weight:700}
+.stepnote{grid-column:1/3;margin:-12px 0 18px;font-size:13px;color:var(--muted);max-width:66ch}
 .steps button.cur{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .steps button{font-weight:500}
-.steps button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid #D98A96;outline-offset:2px}
+.steps button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid #8FA0B3;outline-offset:2px}
 .page{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:28px 28px 20px}
 .page h2{font-size:22px;margin:0 0 4px;font-weight:700;text-wrap:balance;color:var(--ink)}
 .page .intro{color:var(--muted);margin:0 0 20px;max-width:62ch}
@@ -117,6 +122,22 @@ table.grid td.match{color:var(--ok)}
 footer.nav{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);padding:12px 16px}
 footer.nav .inner{max-width:760px;margin:0 auto;display:flex;gap:10px;align-items:center}
 footer.nav .spacer{flex:1;color:var(--muted);font-size:13px}
+.printonly{display:none}
+.btn.primary{font-size:16px;padding:12px 22px}
+.btn.upload{display:inline-block;text-decoration:none}
+.btn.upload,.btn.solid{font-size:16px;padding:12px 22px;background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.closing .certbox{padding:16px 18px}
+.closing .certbox .addrow{margin-top:14px}
+.contacts .vcard{padding:18px 20px}
+.contacts .vcard .addrow{margin-top:14px;gap:12px}
+.closing .contacts{margin-top:22px}
+.closeprint{margin-top:26px}
+.closing{margin-top:6px}
+.closing h3{margin:20px 0 6px;font-size:16px;font-weight:700}
+.closing ol{margin:6px 0 0;padding-left:20px;font-size:14px}
+.closing ol li{margin:0 0 6px}
+.closing .certbox{border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin-top:8px}
+.closing .certbox .addr{margin:6px 0 0}
 .contacts{display:flex;flex-direction:column;gap:12px;margin-top:16px}
 .contacts h3{margin:0;font-size:16px;font-weight:700}
 .vlead{margin:6px 0 -4px;font-size:14px;color:var(--muted)}
@@ -129,11 +150,17 @@ footer.nav .spacer{flex:1;color:var(--muted);font-size:13px}
 .vlinks a{color:var(--accent);font-weight:500}
 .vqr{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;color:var(--muted)}
 .vqr img{border:1px solid var(--line);border-radius:6px;background:#fff}
+.certholder .vname{font-size:14px}
+.contacts .vcard{break-inside:avoid}
 @media (max-width:520px){.vqr{display:none}}
 .summarybox{font:13px/1.5 var(--mono);white-space:pre-wrap;background:var(--ground);border:1px solid var(--line);border-radius:8px;padding:12px;max-height:320px;overflow:auto}
-.later{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.later{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-start;justify-content:center;padding:16px;z-index:50;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .later[hidden]{display:none}
-.later-card{background:var(--panel);border-radius:10px;padding:22px;max-width:560px;width:100%;display:flex;flex-direction:column;gap:12px}
+.later-card{background:var(--panel);border-radius:10px;padding:22px;max-width:560px;width:100%;display:flex;flex-direction:column;gap:12px;margin:auto}
+.later-card{max-height:calc(100vh - 32px);overflow:hidden}
+@supports (height:100dvh){.later-card{max-height:calc(100dvh - 32px)}}
+.later-body{overflow-y:auto;-webkit-overflow-scrolling:touch;display:flex;flex-direction:column;gap:12px;min-height:0}
+.later-actions{border-top:1px solid var(--line);padding-top:12px;margin-top:2px}
 .later-card h3{margin:0;font-size:18px}
 .later-card p{margin:0;font-size:14px}
 .later-card a.btn{text-decoration:none;display:inline-block}
@@ -148,6 +175,7 @@ footer.nav #laterBtn{font-size:13px;padding:8px 12px}
   .steps,footer.nav,.editlink,.addrow,#submitStatus,.note.bad{display:none!important}
   .page{border:none;padding:0;animation:none}
   .review .block,.money{break-inside:avoid;border-color:#bbb}
+  .printonly{display:block}
   .gridwrap{border-color:#bbb}
   header.top img{width:60px}
   a{color:inherit;text-decoration:none}
@@ -162,6 +190,7 @@ footer.nav #laterBtn{font-size:13px;padding:8px 12px}
     <div class="eyebrow">Cultural Homestay International, Summer Work Travel</div>
     <h1>New Host Business Enrollment</h1>
     <nav class="steps" id="steps" aria-label="Form sections"></nav>
+    <p class="stepnote">Fill these in any order. A section turns green once every question on it is answered. You do not have to answer everything to submit.</p>
   </header>
   <main id="main"></main>
 </div>
@@ -174,6 +203,7 @@ footer.nav #laterBtn{font-size:13px;padding:8px 12px}
 <div id="laterBox" class="later" hidden>
   <div class="later-card">
     <h3>Save your progress</h3>
+    <div class="later-body">
     <ol class="plain">
       <li>Press Download my progress. A file lands in your Downloads folder.</li>
       <li>To continue later yourself, open this page again and press Open a saved file.</li>
@@ -186,7 +216,8 @@ footer.nav #laterBtn{font-size:13px;padding:8px 12px}
     <p class="help" id="urlNote"></p>
     <p>Your coworker opens the address, presses Open a saved file, chooses the file you sent, and picks up where you stopped. When they finish, they download the file again and send it back to you, or they press Submit application themselves.</p>
     <p>Nothing reaches CHI until someone presses Submit application.</p>
-    <div class="addrow">
+    </div>
+    <div class="addrow later-actions">
       <button class="btn" type="button" id="saveFileBtn">Download my progress</button>
       <button class="btn secondary" type="button" id="openFileBtn">Open a saved file</button>
       <button class="btn quiet" type="button" id="laterClose">Close</button>
@@ -221,6 +252,19 @@ const CONFIG = {
 
 const STATES = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming","District of Columbia"];
 const YN = ["Yes","No"];
+const AG_L="Primary point of contact";
+const AD_L="Secondary point of contact";
+const PT_L="Participant point of contact";
+const lc = t => t.charAt(0).toLowerCase()+t.slice(1);
+const SAME_AG="Same as the "+lc(AG_L);
+const SAME_AD="Same as the "+lc(AD_L);
+const ELSEWHERE="Someone else at the business";
+const adminIsAG = a => a.P2Same===SAME_AG;
+const adminName = a => adminIsAG(a) ? a.P1Name : a.P2Name;
+const participantName = a => a.PCSame===SAME_AG ? a.P1Name : (a.PCSame===SAME_AD ? adminName(a) : a.PCName);
+const whoIsAdmin = (a,f) => adminIsAG(a) ? ["P1Name","P1"+f] : ["P2Name","P2"+f];
+const whoIsParticipant = (a,f) => a.PCSame===SAME_AG ? ["P1Name","P1"+f] : (a.PCSame===SAME_AD ? whoIsAdmin(a,f) : ["PCName","PC"+f]);
+const CERT_HOLDER = "Cultural Homestay International\n255 West End Avenue\nSan Rafael, CA 94901";
 
 /* ---------- Page 1 season content (verbatim from the Cognito form) ---------- */
 const SEASON_TEXT = {
@@ -239,7 +283,7 @@ const R = (key,label,choices,o={}) => Object.assign({key,label,type:"radio",choi
 const PAGES = [
  { id:"seasons", title:"Seasons", fields:[
    { type:"statement", text:"This application takes about 20 minutes. You can stop at any point. Use Save my progress at the bottom of the page to finish later, or to send what you have to a colleague." },
-   { type:"note", text:"It helps to have your EIN, your business license, and your workers compensation certificate on hand, though you can submit the application and send the documents later. You will describe your work sites and your positions first. Near the end, a grid asks how many participants you need at each work site, and then we ask for your arrival and departure dates." },
+   { type:"note", text:"It helps to have your EIN, your business license, and your workers compensation certificate on hand, though you can submit the application and send the documents later. You will describe your locations and your positions first. Near the end, a grid asks how many participants you need at each location, and then we ask for your arrival and departure dates." },
    { key:"WhichSeasons", type:"seasons", label:"Which seasons are you interested in?", required:true,
      help:"Under Department of State guidelines, a host business may take part in no more than two seasons per year. Each season must fall in a peak period, when you hire extra seasonal staff. The countries and dates under each season are examples, not a full list. They show you roughly when participants arrive and leave, so you can pick the seasons that fit your business. CHI also recruits from other countries, and exact dates change from year to year." },
    R("Hours32","Can you reliably provide each participant with at least 32 hours of work per week, every week of the placement?",["Yes","No","Not sure. I would like to discuss it"]),
@@ -251,7 +295,7 @@ const PAGES = [
    R("TypeOfBusiness","Type of business",["Hotel or resort","Restaurant or bar","Amusement park or attraction","Grocery or retail","Pool or lifeguard management","Concessions or food service contractor","Marina or outdoor recreation","Other"]),
    { key:"StateOfIncorporation", type:"select", label:"State of incorporation", choices:STATES },
    T("EIN","EIN",{help:"Format XX-XXXXXXX. The Department of State requires this to verify every host business.",placeholder:"12-3456789"}),
-   TA("HQAddress","Headquarters or corporate office address",{help:"The address of your corporate or administrative office. You will enter each work location later in the form."}),
+   TA("HQAddress","Headquarters or corporate office address",{help:"The address of your corporate or administrative office. You will enter each location later in the form."}),
    T("Website","Website",{type:"url",placeholder:"https://"}),
    TA("SocialMedia","Social media links"),
    TA("WhyChoose","Why should a participant choose your business?",{placeholder:"The American Grill has been a family-run boardwalk restaurant since 1985. Our summer staff come from all over the world and many come back."}),
@@ -261,15 +305,17 @@ const PAGES = [
  ]},
  { id:"contacts", title:"Contacts", fields:[
    { type:"statement", text:"Please identify the staff members CHI and participants will work with. One person may fill all roles. Many businesses assign a single contact, while larger businesses divide these responsibilities." },
-   { type:"group", label:"Point of contact for host agreements", fields:[
+   { type:"group", label:"Primary point of contact", fields:[
      T("P1Name","Name",{sumLabel:"Primary contact name"}), T("P1Title","Title",{sumLabel:"Primary contact title"}), T("P1Email","Email",{type:"email",required:true,sumLabel:"Primary contact email"}), T("P1Phone","Direct phone",{type:"tel",sumLabel:"Primary contact phone"}) ]},
    { type:"group", label:"Secondary point of contact", fields:[
-     T("P2Name","Name",{sumLabel:"Secondary contact name"}), T("P2Title","Title",{sumLabel:"Secondary contact title"}), T("P2Phone","Direct phone",{type:"tel",sumLabel:"Secondary contact phone"}), T("P2Email","Email",{type:"email",sumLabel:"Secondary contact email"}) ]},
+     R("P2Same","Who is the secondary point of contact?",[SAME_AG,ELSEWHERE]),
+     { key:"P2Echo", type:"computed", label:"Secondary point of contact", sumLabel:"Secondary contact", showIf:a=>a.P2Same===SAME_AG, compute:(self,a)=>["P1Name","P1Title","P1Phone","P1Email"].map(x=>String(a[x]||"").trim()).filter(Boolean).join(", ") },
+     T("P2Name","Name",{showIf:a=>a.P2Same===ELSEWHERE,sumLabel:"Secondary contact name"}), T("P2Title","Title",{showIf:a=>a.P2Same===ELSEWHERE,sumLabel:"Secondary contact title"}), T("P2Phone","Direct phone",{type:"tel",showIf:a=>a.P2Same===ELSEWHERE,sumLabel:"Secondary contact phone"}), T("P2Email","Email",{type:"email",showIf:a=>a.P2Same===ELSEWHERE,sumLabel:"Secondary contact email"}) ]},
    { type:"group", label:"Participant point of contact", fields:[
      { type:"note", text:"Participants correspond with this staff member before arrival." },
-     R("PCSame","Who is the participant contact?",["Same as the primary contact","Same as the secondary contact","Other"]),
-     { key:"PCEcho", type:"computed", label:"Participant point of contact", showIf:a=>a.PCSame&&a.PCSame!=="Other", compute:(self,a)=>{ const k=a.PCSame==="Same as the primary contact"?["P1Name","P1Title","P1Phone","P1Email"]:["P2Name","P2Title","P2Phone","P2Email"]; return k.map(x=>String(a[x]||"").trim()).filter(Boolean).join(", "); } },
-     T("PCName","Name",{showIf:a=>a.PCSame==="Other",sumLabel:"Participant contact name"}), T("PCTitle","Title",{showIf:a=>a.PCSame==="Other",sumLabel:"Participant contact title"}), T("PCPhone","Direct phone",{type:"tel",showIf:a=>a.PCSame==="Other",sumLabel:"Participant contact phone"}), T("PCEmail","Email",{type:"email",showIf:a=>a.PCSame==="Other",sumLabel:"Participant contact email"}),
+     R("PCSame","Who is the participant point of contact?",[SAME_AG,SAME_AD,ELSEWHERE]),
+     { key:"PCEcho", type:"computed", label:"Participant point of contact", showIf:a=>a.PCSame&&a.PCSame!==ELSEWHERE, compute:(self,a)=>{ const k=a.PCSame===SAME_AG?["P1Name","P1Title","P1Phone","P1Email"]:(a.P2Same===SAME_AG?["P1Name","P1Title","P1Phone","P1Email"]:["P2Name","P2Title","P2Phone","P2Email"]); return k.map(x=>String(a[x]||"").trim()).filter(Boolean).join(", "); } },
+     T("PCName","Name",{showIf:a=>a.PCSame===ELSEWHERE,sumLabel:"Participant contact name"}), T("PCTitle","Title",{showIf:a=>a.PCSame===ELSEWHERE,sumLabel:"Participant contact title"}), T("PCPhone","Direct phone",{type:"tel",showIf:a=>a.PCSame===ELSEWHERE,sumLabel:"Participant contact phone"}), T("PCEmail","Email",{type:"email",showIf:a=>a.PCSame===ELSEWHERE,sumLabel:"Participant contact email"}),
      T("PCWhatsApp","WhatsApp",{type:"tel",help:"Optional. Many employers find it useful for arrival and scheduling.",sumLabel:"Participant contact WhatsApp"}) ]}
  ]},
  { id:"compliance", title:"Program Rules", fields:[
@@ -297,7 +343,7 @@ const PAGES = [
    { key:"AckTerms", type:"ack", label:"Employment terms", text:"Participants are at-will employees, like any other member of your staff. They may take an additional job once CHI has vetted and approved it, as long as it does not interfere with the position you offered. Program regulations do not allow sponsors to block an approved second job or a job change (22 CFR 62.32). A stable, predictable schedule is the single biggest factor in keeping a participant for the full season." },
    { key:"AckProblems", type:"ack", label:"Problems with a participant", text:"CHI asks both host businesses and participants to commit to the first 30 days, so both sides can work through the cultural adjustment period. If a participant is not meeting expectations, or is facing disciplinary action, contact CHI before you act. Many of these problems are cultural, and we can often talk the participant through them. Report any termination to CHI immediately. Report any emergency affecting a participant's health, safety or welfare immediately as well (22 CFR 62.32)." },
    R("EVerify","Do you use E-Verify?",YN),
-   R("OnlinePaperwork","Do participants complete new-hire paperwork online before they arrive at your host business?",YN,{help:"Onboarding invitations sent to international email addresses often land in spam folders. Please tell CHI when you send them, so we can confirm participants received them."}),
+   R("OnlinePaperwork","Do participants complete new-hire paperwork online before they arrive?",YN,{help:"Onboarding invitations sent to international email addresses often land in spam folders. Please tell CHI when you send them, so we can confirm participants received them."}),
    TA("ReportOnArrival","Where and when should participants report on arrival?",{placeholder:"Monday to Friday 9 to 5, employee entrance on Main Street, ask for HR."}),
    TA("DaysToFirstShift","How many days between arrival and the first scheduled shift?",{placeholder:"Usually 2 to 3 days. Orientation is the first Monday after arrival.",help:"Participants pay their own living expenses from the day they arrive. We tell them in advance how many days to expect before their first paid shift."}),
    T("TrainingLength","How long is training?",{placeholder:"Two weeks"}),
@@ -309,10 +355,10 @@ const PAGES = [
  ]},
  { id:"selection", title:"Selection", fields:[
    R("Selection","How would you like to be involved in selection?",["CHI may select my candidates","I will conduct interviews","Send me the video introductions and I will choose"],{help:"CHI screens every candidate before we present them to you. Each one records a short video in English, so you can see their personality and hear how they speak. Placement is competitive. Every candidate has hundreds of jobs to choose from, and most accept the first offer they get. If you interview, finish within one week of receiving candidates to have the best chance at your first choices."}),
-   R("InterviewerChoice","Who will conduct the interviews?",["Point of contact for host agreements","Secondary point of contact","Participant point of contact","Other"],{showIf:a=>a.Selection==="I will conduct interviews"}),
-   { key:"InterviewerEcho", type:"computed", label:"Interviewer", sumLabel:"Interviewer", showIf:a=>a.Selection==="I will conduct interviews"&&a.InterviewerChoice&&a.InterviewerChoice!=="Other", compute:(self,a)=>{ const k={"Point of contact for host agreements":["P1Name","P1Email"],"Secondary point of contact":["P2Name","P2Email"],"Participant point of contact":a.PCSame==="Same as the primary contact"?["P1Name","P1Email"]:(a.PCSame==="Same as the secondary contact"?["P2Name","P2Email"]:["PCName","PCEmail"])}[a.InterviewerChoice]||[]; return k.map(x=>String(a[x]||"").trim()).filter(Boolean).join(", "); } },
-   T("Interviewer","Name",{sumLabel:"Interviewer name",placeholder:"Jessica Smith",showIf:a=>a.Selection==="I will conduct interviews"&&a.InterviewerChoice==="Other"}),
-   T("InterviewerEmail","Email",{type:"email",sumLabel:"Interviewer email",placeholder:"jessica@americangrill.com",showIf:a=>a.Selection==="I will conduct interviews"&&a.InterviewerChoice==="Other"}),
+   R("InterviewerChoice","Who will conduct the interviews?",[AG_L,AD_L,PT_L,ELSEWHERE],{showIf:a=>a.Selection==="I will conduct interviews"}),
+   { key:"InterviewerEcho", type:"computed", label:"Interviewer", sumLabel:"Interviewer", showIf:a=>a.Selection==="I will conduct interviews"&&a.InterviewerChoice&&a.InterviewerChoice!==ELSEWHERE, compute:(self,a)=>{ const k={[AG_L]:["P1Name","P1Email"],[AD_L]:whoIsAdmin(a,"Email"),[PT_L]:whoIsParticipant(a,"Email")}[a.InterviewerChoice]||[]; return k.map(x=>String(a[x]||"").trim()).filter(Boolean).join(", "); } },
+   T("Interviewer","Name",{sumLabel:"Interviewer name",placeholder:"Jessica Smith",showIf:a=>a.Selection==="I will conduct interviews"&&a.InterviewerChoice===ELSEWHERE}),
+   T("InterviewerEmail","Email",{type:"email",sumLabel:"Interviewer email",placeholder:"jessica@americangrill.com",showIf:a=>a.Selection==="I will conduct interviews"&&a.InterviewerChoice===ELSEWHERE}),
    { key:"Platform", type:"checks", label:"Which platform is preferred by your team? Check all that apply.", sumLabel:"Interview platforms", choices:["Zoom","Google Meet","Microsoft Teams","WhatsApp video","Webex","Other"], showIf:a=>a.Selection==="I will conduct interviews" },
    T("PlatformOther","Which other platform?",{sumLabel:"Other interview platform",showIf:a=>a.Selection==="I will conduct interviews"&&(a.Platform||[]).includes("Other")})
  ]},
@@ -320,14 +366,12 @@ const PAGES = [
  { id:"positions", title:"Position Information", custom:"positions" },
  { id:"grid", title:"Request Numbers", custom:"grid" },
  { id:"timing", title:"Requested Dates", custom:"timing" },
- { id:"workerscomp", title:"Required Documents", fields:[
-   { type:"upload", label:"Business license", help:"The Department of State requires CHI to confirm that every host business is registered and legally operating. Upload your business license or state registration here, or email it to chijennifer@chinet.org." },
-   T("WCCarrier","Workers compensation carrier",{help:"The Department of State requires CHI to verify workers compensation coverage for every host business (22 CFR 62.32). Your application is not complete until we receive your certificate. If your policy renews during the season, please send us the updated copy. We use it only to confirm that your business is insured and legally operating.",placeholder:"Carrier name"}),
+ { id:"workerscomp", title:"Workers Compensation", fields:[
+   { type:"address", label:"Before you call your insurance agent, here is the certificate holder they will ask for:", text:CERT_HOLDER },
+   T("WCCarrier","Workers compensation carrier",{help:"The Department of State requires CHI to verify workers compensation coverage for every host business (22 CFR 62.32). Your application is not final until we receive your certificate. If your policy renews during the season, please send us the updated copy. We use it only to confirm that your business is insured and legally operating.",placeholder:"Carrier name"}),
    T("WCPolicy","Policy number"),
    T("WCStart","Coverage start date",{type:"date"}),
-   T("WCEnd","Coverage end date",{type:"date"}),
-   { type:"upload", label:"Workers compensation certificate of insurance", help:"You can upload your certificate here or email it to chijennifer@chinet.org." },
-   { type:"address", label:"If your insurance agent asks who to list as the certificate holder:", text:"Cultural Homestay International\n255 West End Avenue\nSan Rafael, CA 94901" }
+   T("WCEnd","Coverage end date",{type:"date"})
  ]},
  { id:"review", title:"Review and submit", custom:"review" }
 ];
@@ -340,7 +384,7 @@ const LOC_FIELDS = [
   { type:"row", fields:[ T("City","City"), { key:"State", type:"select", label:"State", choices:STATES }, T("Zip","ZIP",{type:"text"}) ]},
   T("Phone","Business phone number",{type:"tel"}),
 { type:"rule", text:"Participants cannot work overnight shifts. A shift that runs late, such as a 2 am close, is fine. A shift that runs through the night, such as 11 pm to 7 am, is not allowed (22 CFR 62.32)." },
-  { type:"group", label:"Operating hours at this work site", fields:[
+  { type:"group", label:"Operating hours at this location", fields:[
     { type:"row", fields:[
       { key:"OpenTime", type:"select", label:"Opens", choices:["Open 24 hours"].concat(TIMES) },
       { key:"CloseTime", type:"select", label:"Closes", choices:TIMES, showIf:l=>l.OpenTime!=="Open 24 hours" }
@@ -349,11 +393,13 @@ const LOC_FIELDS = [
   ]},
   R("HoursChange","Do your operating hours change during the season?",["Same hours all season","Hours change during the season"]),
   TA("HoursSeason","Describe your operating hours through the season",{placeholder:"Weekends only until mid June. Seven days a week, 10 am to midnight, mid June through Labor Day. Weekends only in September.",showIf:l=>l.HoursChange==="Hours change during the season"}),
+  R("Meals","Do you provide staff meals?",["No","Yes, one free shift meal","Yes, at a discount"]),
+  TA("MealsDetail","How much is the discount, and what does it cover?",{sumLabel:"Staff meal discount",showIf:l=>l.Meals==="Yes, at a discount",placeholder:"50 percent off the staff menu during a shift. Soft drinks are free."}),
   R("LocationType","Location type",["Beach town","Mountain resort","City","Suburb","Rural","Amusement park"]),
-  R("ContactChoice","Who is the contact for this location?",["Primary contact","Secondary contact","Participant contact","Other"]),
-  { key:"ContactName", type:"computed", label:"Contact for this location", showIf:l=>l.ContactChoice&&l.ContactChoice!=="Other", compute:(loc,a)=>({ "Primary contact":a.P1Name, "Secondary contact":a.P2Name, "Participant contact":(a.PCSame==="Same as the primary contact"?a.P1Name:(a.PCSame==="Same as the secondary contact"?a.P2Name:a.PCName)) })[loc.ContactChoice]||"" },
-  { type:"row", fields:[ T("OtherName","Name",{showIf:l=>l.ContactChoice==="Other"}), T("OtherTitle","Title",{showIf:l=>l.ContactChoice==="Other"}) ]},
-  { type:"row", fields:[ T("OtherEmail","Email",{type:"email",showIf:l=>l.ContactChoice==="Other"}), T("OtherPhone","Phone",{type:"tel",showIf:l=>l.ContactChoice==="Other"}) ]},
+  R("ContactChoice","Who is the contact for this location?",[AG_L,AD_L,PT_L,ELSEWHERE]),
+  { key:"ContactName", type:"computed", label:"Contact for this location", showIf:l=>l.ContactChoice&&l.ContactChoice!==ELSEWHERE, compute:(loc,a)=>({ [AG_L]:a.P1Name, [AD_L]:adminName(a), [PT_L]:participantName(a) })[loc.ContactChoice]||"" },
+  { type:"row", fields:[ T("OtherName","Name",{showIf:l=>l.ContactChoice===ELSEWHERE}), T("OtherTitle","Title",{showIf:l=>l.ContactChoice===ELSEWHERE}) ]},
+  { type:"row", fields:[ T("OtherEmail","Email",{type:"email",showIf:l=>l.ContactChoice===ELSEWHERE}), T("OtherPhone","Phone",{type:"tel",showIf:l=>l.ContactChoice===ELSEWHERE}) ]},
   R("Housing","Housing arrangement for participants at this location",["We provide it directly","Through a landlord or housing provider we arrange","We recommend options but do not arrange","No housing; participants arrange their own"]),
   TA("Directions","Do you have specific instructions for getting to this location?",{help:"CHI provides general travel guidance from the airport. Use this space for anything specific to your location.",placeholder:"Take the Trailways bus to the East Main Street stop and call the front desk when you arrive. The hotel van will pick you up."})
 ];
@@ -362,14 +408,14 @@ const HOUSING_FIELDS = [
   T("HName","Housing name",{placeholder:"Main Street Apartments, Unit 2"}),
   T("HStreet","Street address"),
   { type:"row", fields:[ T("HCity","City"), { key:"HState", type:"select", label:"State", choices:STATES }, T("HZip","ZIP") ]},
-  R("HContactChoice","Who is the contact for this housing?",["Primary contact","Secondary contact","Participant contact","Landlord"]),
-  { key:"HContactName", type:"computed", label:"Contact for this housing", showIf:h=>h.HContactChoice&&h.HContactChoice!=="Landlord", compute:(h,a)=>({ "Primary contact":a.P1Name, "Secondary contact":a.P2Name, "Participant contact":(a.PCSame==="Same as the primary contact"?a.P1Name:(a.PCSame==="Same as the secondary contact"?a.P2Name:a.PCName)) })[h.HContactChoice]||"" },
+  R("HContactChoice","Who is the contact for this housing?",[AG_L,AD_L,PT_L,"Landlord"]),
+  { key:"HContactName", type:"computed", label:"Contact for this housing", showIf:h=>h.HContactChoice&&h.HContactChoice!=="Landlord", compute:(h,a)=>({ [AG_L]:a.P1Name, [AD_L]:adminName(a), [PT_L]:participantName(a) })[h.HContactChoice]||"" },
   T("LandlordName","Landlord name",{showIf:h=>h.HContactChoice==="Landlord"}),
   { type:"row", fields:[ T("LandlordPhone","Phone",{type:"tel",showIf:h=>h.HContactChoice==="Landlord"}), T("LandlordEmail","Email",{type:"email",showIf:h=>h.HContactChoice==="Landlord"}) ]},
   R("HType","Type of housing",["House","Apartment","Dormitory","Motel or hotel rooms","Other"]),
   T("PerRoom","Participants per room",{placeholder:"4 per room."}),
   R("SingleGender","Are bedrooms single-gender?",YN),
-  R("Beds","What type of beds?",["Single beds","Bunk beds","Other"],{help:"Department of State housing guidance requires a separate bed for each participant."}),
+  R("Beds","Type of beds",["Single beds","Bunk beds","Other"],{help:"Department of State housing guidance requires a separate bed for each participant."}),
   T("BedsOther","Describe the beds",{showIf:h=>h.Beds==="Other"}),
   T("Bathrooms","How many bathrooms, and how many people share each?",{placeholder:"2 bathrooms, 4 people each."}),
   R("BathShared","Are bathrooms shared between genders?",YN),
@@ -382,7 +428,7 @@ const HOUSING_FIELDS = [
   T("DepositAmount","Deposit amount",{type:"number",step:"0.01",money:true}),
   { type:"row", fields:[ T("DepositDue","Deposit due date",{placeholder:"On arrival."}), T("DepositTerms","Deposit refund terms",{placeholder:"A $50 cleaning fee is deducted at move out."}) ]},
   { key:"Included", type:"checks", label:"What is included with the housing? Check all that apply.", sumLabel:"Included with housing", choices:["Kitchen with cookware","Sheets","Pillow","Blanket","Towels","Wi-Fi","Electric","Water","Gas or heat","Air conditioning","Coin-operated washer","Coin-operated dryer","Free washer","Free dryer"] },
-  R("LinenService","How often are linens changed or laundered?",["Weekly","Every two weeks","On request","Provided once at move in, participants launder them"],{showIf:h=>h.HType==="Motel or hotel rooms"}),
+  R("LinenService","How often are linens changed or laundered?",["Weekly","Every two weeks","On request","Provided once at move in; participants launder them"],{showIf:h=>h.HType==="Motel or hotel rooms"}),
   T("Bring","What must participants bring or buy?",{placeholder:"Cleaning supplies, kitchen basics, a fan."}),
   R("Mandatory","Is housing mandatory?",YN),
   T("Guests","Are overnight guests allowed?",{placeholder:"With advance approval, no more than two nights."}),
@@ -403,7 +449,7 @@ const HOUSING_FIELDS = [
 const CERT_TITLE = t => /g[ua]{1,2}rd|swim|water\s*safety|pool\s*attendant|beach\s*patrol|aquatic/i.test(String(t||""));
 const POS_FIELDS = [
   T("Title","Position title",{placeholder:"Line Cook",required:true}),
-  R("ScheduleSame","Is the schedule the same each week?",["Same every week","Rotates on a set pattern","Changes week to week"],{help:"A stable, predictable schedule is the number one factor in retaining your participant."}),
+  R("ScheduleSame","Is the schedule the same each week?",["Same every week","Rotates on a set pattern","Changes week to week"],{help:"A stable, predictable schedule is the single biggest factor in keeping a participant for the full season."}),
   TA("Description","Position description",{help:"Please describe the duties of this position. If you already have a written job description, you may upload it below or email it to chijennifer@chinet.org in place of completing this field.",placeholder:"Cooks menu items on the line, stocks stations, cleans the kitchen at close."}),
   { type:"upload", label:"Job description" },
   TA("OtherRoles","Will participants in this position also be scheduled in other roles?",{help:"If a participant will regularly work across several roles, list each one here. CHI will combine them into a single Team Member position so participants know the job includes a mix of duties. All roles must appear in the job offer (22 CFR 62.32).",placeholder:"Dishwashing, prep, closing cleanup."}),
@@ -414,9 +460,9 @@ const POS_FIELDS = [
   T("Wage","Hourly wage before taxes",{type:"number",step:"0.01",money:true,help:"You must pay participants the higher of the applicable federal, state, or local minimum wage, or the wage you pay U.S. workers in the same position (22 CFR 62.32)."}),
   R("Tipped","Is this position tipped?",["No","Yes, tips are kept individually","Yes, tips are pooled"]),
   TA("TipsDetail","How are tips divided and paid out?",{showIf:p=>/^Yes/.test(p.Tipped||""),placeholder:"Servers tip out 2 percent of sales to bussers and 1 percent to the bar, paid in cash at the end of each shift."}),
-  { key:"UniformItems", type:"checks", label:"What does the business issue? Check all that apply.", choices:["Shirt or top","Pants or shorts","Apron","Hat or visor","Jacket or outerwear","Name tag","Shoes","Swimsuit","Tie","Belt"] },
-  T("ShirtCount","How many shirts are issued?",{type:"number",step:"1",showIf:p=>(p.UniformItems||[]).includes("Shirt or top")}),
-  R("ShoeColor","Shoe color required",["All black, including the sole and logo","Black, any logo is fine","Any dark color","Any color","No requirement"]),
+  { key:"UniformItems", type:"checks", label:"Which uniform items do you issue? Check all that apply.", choices:["Shirt or top","Pants or shorts","Apron","Hat or visor","Jacket or outerwear","Name tag","Shoes","Swimsuit","Tie","Belt"] },
+  T("ShirtCount","How many shirts do you issue?",{type:"number",step:"1",showIf:p=>(p.UniformItems||[]).includes("Shirt or top")}),
+  R("ShoeColor","Required shoe color",["All black, including the sole and logo","Black, any logo is fine","Any dark color","Any color","No requirement"]),
   R("ShoeSlip","Are non-slip or slip-resistant shoes required?",YN),
   TA("Uniform","Anything else about the uniform or dress code?"),
   R("UniformCost","Is there a uniform cost to the participant?",YN),
@@ -455,9 +501,29 @@ const newHousing = () => ({ Included:[] });
 const newPos = () => ({});
 let S = { page:0, a:{ WhichSeasons:[] }, locations:[newLoc()], positions:[newPos()], grid:{Winter:{},Spring:{},Summer:{}}, timing:{Winter:{},Spring:{},Summer:{}}, submitted:false };
 const KEY="chi-host-enrollment-draft-v1";
-const OLD_VALUES={"A different person":"Other","Something else":"Other","Someone else":"Other","Same as the CHI contact":"Same as the primary contact","Same as the backup contact":"Same as the secondary contact","Alternate contact":"Secondary contact"};
+const OLD_VALUES={"Provided once at move in, participants launder them":"Provided once at move in; participants launder them","Yes, free":"Yes, one free shift meal"};
 function migrate(o){ if(!o||typeof o!=="object") return; Object.keys(o).forEach(k=>{ const v=o[k]; if(typeof v==="string"){ if(OLD_VALUES[v]) o[k]=OLD_VALUES[v]; } else if(Array.isArray(v)) v.forEach(migrate); else if(v&&typeof v==="object") migrate(v); }); }
-function migrateAll(){ (S.locations||[]).forEach(l=>(l.housing||[]).forEach(h=>{ if(typeof h.MoveInOut==="string"&&h.MoveInOut.trim()&&!h.MoveNotes){ h.MoveNotes=h.MoveInOut; } delete h.MoveInOut; })); if(typeof S.a.Platform==="string"){ const t=S.a.Platform.trim(); S.a.Platform=t?["Other"]:[]; if(t) S.a.PlatformOther=t; } (S.locations||[]).forEach(l=>{ if(Array.isArray(l.ClosedDays)&&!l.OpenDays){ l.OpenDays=DAYS.filter(d=>!l.ClosedDays.includes(d)); } delete l.ClosedDays; }); (S.positions||[]).forEach(p=>{ if(p.Tipped==="Yes"){ p.Tipped=p.TipsPooled==="Yes"?"Yes, tips are pooled":"Yes, tips are kept individually"; } delete p.TipsPooled; }); migrate(S.a); (S.locations||[]).forEach(l=>{ migrate(l); (l.housing||[]).forEach(migrate); }); (S.positions||[]).forEach(migrate); Object.values(S.timing||{}).forEach(migrate); }
+function normalizeState(){
+  if(!S.a||typeof S.a!=="object") S.a={};
+  if(!Array.isArray(S.locations)) S.locations=[];
+  if(!Array.isArray(S.positions)) S.positions=[];
+  S.locations=S.locations.filter(l=>l&&typeof l==="object");
+  S.positions=S.positions.filter(p=>p&&typeof p==="object");
+  S.locations.forEach(l=>{ if(!Array.isArray(l.housing)) l.housing=[]; l.housing=l.housing.filter(h=>h&&typeof h==="object"); });
+  if(!S.grid||typeof S.grid!=="object") S.grid={};
+  SEASONS.forEach(sn=>{ if(!S.grid[sn]||typeof S.grid[sn]!=="object") S.grid[sn]={}; });
+  if(!S.timing||typeof S.timing!=="object") S.timing={};
+  SEASONS.forEach(sn=>{ if(!S.timing[sn]||typeof S.timing[sn]!=="object") S.timing[sn]={}; });
+  if(!Array.isArray(S.a.WhichSeasons)) S.a.WhichSeasons=S.a.WhichSeasons?[String(S.a.WhichSeasons)]:[];
+  if(typeof S.page!=="number"||S.page<0||S.page>=PAGES.length) S.page=0;
+}
+const ROLE_MAP={"Primary contact":AG_L,"Secondary contact":AD_L,"Participant contact":PT_L,"Point of contact for host agreements":AG_L,"Administrative point of contact":AD_L,"Same as the point of contact for host agreements":SAME_AG,"Same as the administrative point of contact":SAME_AD,"Other":ELSEWHERE,"A different person":ELSEWHERE,"Something else":ELSEWHERE,"Someone else":ELSEWHERE,"Same as the primary contact":SAME_AG,"Same as the CHI contact":SAME_AG,"Same as the secondary contact":SAME_AD,"Same as the backup contact":SAME_AD};
+function migrateRole(o,key){ if(!o) return; const v=o[key]; if(typeof v==="string"&&ROLE_MAP[v]) o[key]=ROLE_MAP[v]; }
+function migrateAll(){ normalizeState();
+  migrateRole(S.a,"InterviewerChoice"); migrateRole(S.a,"PCSame");
+  if(!S.a.P2Same) S.a.P2Same = (S.a.P2Name||S.a.P2Email) ? ELSEWHERE : "";
+  (S.locations||[]).forEach(l=>{ migrateRole(l,"ContactChoice"); (l.housing||[]).forEach(h=>migrateRole(h,"HContactChoice")); });
+  (S.locations||[]).forEach(l=>(l.housing||[]).forEach(h=>{ if(typeof h.MoveInOut==="string"&&h.MoveInOut.trim()&&!h.MoveNotes){ h.MoveNotes=h.MoveInOut; } delete h.MoveInOut; })); if(typeof S.a.Platform==="string"){ const t=S.a.Platform.trim(); S.a.Platform=t?["Other"]:[]; if(t) S.a.PlatformOther=t; } (S.locations||[]).forEach(l=>{ if(Array.isArray(l.ClosedDays)&&!l.OpenDays){ l.OpenDays=DAYS.filter(d=>!l.ClosedDays.includes(d)); } delete l.ClosedDays; }); (S.positions||[]).forEach(p=>{ if(p.Tipped==="Yes"){ p.Tipped=p.TipsPooled==="Yes"?"Yes, tips are pooled":"Yes, tips are kept individually"; } delete p.TipsPooled; }); migrate(S.a); (S.locations||[]).forEach(l=>{ migrate(l); (l.housing||[]).forEach(migrate); }); (S.positions||[]).forEach(migrate); Object.values(S.timing||{}).forEach(migrate); }
 function load(){ try{ const raw=localStorage.getItem(KEY); if(raw){ const d=JSON.parse(raw); if(d&&d.a) S=Object.assign(S,d); } }catch(e){} S.timing=S.timing||{Winter:{},Spring:{},Summer:{}}; migrateAll(); }
 let saveTimer;
 function save(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); document.getElementById("saveNote").textContent="Draft saved on this device"; }catch(e){} },300); }
@@ -492,8 +558,8 @@ function renderField(f, obj, ctx, idPrefix){
     wrap.append(el("div",{class:"q"},f.label), el("p",{class:"addr"},f.text));
     const note=el("p",{class:"help"},"");
     const addrP=wrap.querySelector(".addr");
-    const copy=el("button",{type:"button",class:"btn quiet",onclick:()=>copyText(f.text,()=>{note.textContent="Address copied.";},()=>{note.textContent="The address is selected above. Press Command C or Control C to copy it.";},addrP)},"Copy the address");
-    wrap.append(el("div",{class:"addrow"},copy), note);
+    const copy=el("button",{type:"button",class:"btn solid",onclick:()=>copyText(f.text,()=>{note.textContent="Address copied.";},()=>{note.textContent="The address is selected above. Press Command C or Control C to copy it.";},addrP)},"Copy the address");
+    wrap.append(el("div",{class:"addrow",style:"margin-top:10px"},copy), note);
     return wrap;
   }
   if(f.type==="upload"){ if(!CONFIG.dropboxUrl) return el("span",{hidden:true}); const wrap=el("div",{class:"field"}); if(f.label) wrap.append(el("div",{class:"q"},f.label)); if(f.help) wrap.append(el("p",{class:"help"},f.help)); wrap.append(el("div",{class:"addrow"}, el("a",{class:"btn quiet",href:CONFIG.dropboxUrl,target:"_blank",rel:"noopener"},"Upload documents")));
@@ -573,9 +639,47 @@ function render(){
   window.scrollTo({top:0,behavior:"instant"});
   save();
 }
+/* ---------- Progress colouring for the step buttons ---------- */
+const OPTIONAL_KEYS = new Set(["SocialMedia","Website","Cultural","WhyChoose","PayComments","Directions",
+  "Guests","MoveNotes","Appearance","Uniform","Notes","HoursSeason","Under32Weeks","OtherRoles",
+  "UniformCostOther","PlatformOther","CertFee","Training","ConfirmArrival","AfterTermination",
+  "KitchenAccess","BedsOther","DepositTerms","OtherSponsorCount"]);
+const counts = f => !!f.key && f.type!=="computed" && f.type!=="note" && f.type!=="statement"
+  && f.type!=="rule" && f.type!=="upload" && !OPTIONAL_KEYS.has(f.key)
+  && !/^Anything else/i.test(String(f.label||"")) && !/^Comments$/i.test(String(f.label||""));
+const hasVal = v => Array.isArray(v) ? v.length>0 : (v!=null && String(v).trim()!=="");
+function tally(fields,obj,acc){
+  fields.forEach(f=>{
+    if(f.type==="row"||f.type==="group"){ if(f.showIf&&!f.showIf(obj)) return; return tally(f.fields,obj,acc); }
+    if(f.showIf&&!f.showIf(obj)) return;
+    if(f.type==="seasons"){ acc.total++; if((obj.WhichSeasons||[]).length) acc.filled++; return; }
+    if(f.type==="ack"){ acc.total++; if(obj[f.key]==="I understand") acc.filled++; return; }
+    if(!counts(f)) return;
+    acc.total++; if(hasVal(obj[f.key])) acc.filled++;
+  });
+}
+function pageProgress(i){
+  const p=PAGES[i], acc={total:0,filled:0};
+  if(p.fields) tally(p.fields,S.a,acc);
+  else if(p.custom==="locations"){ S.locations.forEach(l=>{ tally(LOC_FIELDS,l,acc);
+      if(HOUSING_SHOW(l.Housing)) (l.housing||[]).forEach(h=>tally(HOUSING_FIELDS,h,acc)); }); }
+  else if(p.custom==="positions"){ S.positions.forEach(q=>tally(POS_FIELDS,q,acc)); }
+  else if(p.custom==="grid"){ acc.total=1; acc.filled=grandTotal()>0?1:0; }
+  else if(p.custom==="timing"){ selectedSeasons().forEach(sn=>tally(timingFields(sn),S.timing[sn],acc)); }
+  else return "";
+  if(!acc.total) return "";
+  if(acc.filled===0) return "";
+  return acc.filled===acc.total ? "done" : "part";
+}
 function renderSteps(){
   const n=document.getElementById("steps"); n.innerHTML="";
-  PAGES.forEach((p,i)=>n.append(el("button",{type:"button",class:i===S.page?"cur":(i<S.page?"done":""),onclick:()=>{ if(i<=S.page||validatePage()) { S.page=i; render(); } }},(i+1)+". "+p.title)));
+  PAGES.forEach((p,i)=>{
+    const st=pageProgress(i);
+    const cls=(i===S.page?"cur ":"")+(st==="done"?"ok":(st==="part"?"part":""));
+    const b=el("button",{type:"button",class:cls.trim(),onclick:()=>{ S.page=i; render(); }},(i+1)+". "+p.title);
+    if(st==="done") b.append(el("span",{class:"tick"},"\u2713"));
+    n.append(b);
+  });
 }
 function renderLocations(page){
   page.append(el("h2",{id:"pagetitle"},"Location Information"), el("p",{class:"intro"},"Enter your first location below. Additional locations can be added at the bottom of this page."));
@@ -585,12 +689,13 @@ function renderLocations(page){
 }
 function renderLocation(loc,i){
   const item=el("div",{class:"item"});
-  item.append(el("div",{class:"itemhead"}, el("h3",{},"Location "+(i+1)), el("span",{class:"sub"},locName(loc,i)!=="Location "+(i+1)?locName(loc,i):""), S.locations.length>1?el("button",{type:"button",class:"remove",onclick:()=>{ S.locations.splice(i,1); SEASONS.forEach(sn=>{ const g=S.grid[sn]; const ng={}; Object.keys(g).map(Number).sort((x,y)=>x-y).forEach(k=>{ if(k<i) ng[k]=g[k]; else if(k>i) ng[k-1]=g[k]; }); S.grid[sn]=ng; }); render(); }},"Remove"):null));
+  item.append(el("div",{class:"itemhead"}, el("h3",{},"Location "+(i+1)), el("span",{class:"sub"},locName(loc,i)!=="Location "+(i+1)?locName(loc,i):""), S.locations.length>1?el("button",{type:"button",class:"remove",onclick:()=>{ S.locations.splice(i,1); SEASONS.forEach(sn=>{ const g=S.grid[sn]||{}; const ng={}; Object.keys(g).map(Number).sort((x,y)=>x-y).forEach(k=>{ if(k<i) ng[k]=g[k]; else if(k>i) ng[k-1]=g[k]; }); S.grid[sn]=ng; }); save(); render(); }},"Remove"):null));
   const box=el("div",{class:"fields"});
   LOC_FIELDS.forEach(f=>box.append(renderField(f,loc,{index:i,self:loc},"loc"+i)));
   item.append(box);
   const hb=el("div",{class:"housingblock subsection",hidden:!HOUSING_SHOW(loc.Housing)}); hb._loc=loc;
   hb.append(el("h4",{},"Housing at this location",el("span",{class:"pill"},"Location "+(i+1))));
+  if(!Array.isArray(loc.housing)) loc.housing=[];
   if(!loc.housing.length) loc.housing.push(newHousing());
   loc.housing.forEach((h,j)=>{
     const n=el("div",{class:"nested"});
@@ -607,7 +712,7 @@ function renderPositions(page){
   const list=el("div",{class:"fields"});
   S.positions.forEach((pos,i)=>{
     const item=el("div",{class:"item"});
-    item.append(el("div",{class:"itemhead"}, el("h3",{},"Position "+(i+1)), el("span",{class:"sub"},pos.Title||""), S.positions.length>1?el("button",{type:"button",class:"remove",onclick:()=>{ S.positions.splice(i,1); SEASONS.forEach(sn=>Object.values(S.grid[sn]).forEach(r=>{ const nr={}; Object.keys(r).map(Number).sort((x,y)=>x-y).forEach(k=>{ if(k<i) nr[k]=r[k]; else if(k>i) nr[k-1]=r[k]; }); Object.keys(r).forEach(k=>delete r[k]); Object.assign(r,nr); })); render(); }},"Remove"):null));
+    item.append(el("div",{class:"itemhead"}, el("h3",{},"Position "+(i+1)), el("span",{class:"sub"},pos.Title||""), S.positions.length>1?el("button",{type:"button",class:"remove",onclick:()=>{ S.positions.splice(i,1); SEASONS.forEach(sn=>Object.values(S.grid[sn]||{}).forEach(r=>{ if(!r||typeof r!=="object") return; const nr={}; Object.keys(r).map(Number).sort((x,y)=>x-y).forEach(k=>{ if(k<i) nr[k]=r[k]; else if(k>i) nr[k-1]=r[k]; }); Object.keys(r).forEach(k=>delete r[k]); Object.assign(r,nr); })); save(); render(); }},"Remove"):null));
     const box=el("div",{class:"fields"});
     POS_FIELDS.forEach(f=>box.append(renderField(f,pos,{self:pos},"pos"+i)));
     item.append(box);
@@ -741,16 +846,19 @@ function buildSummary(){
   lines.push("", "== REQUESTED DATES ==");
   selectedSeasons().forEach(sn=>{ const tv=S.timing[sn]; const rows=[]; const walk=fs=>fs.forEach(f=>{ if(f.type==="row"||f.type==="group") return walk(f.fields); if(f.type==="note"||f.type==="statement"||!f.key) return; const v=fmtA(tv,f.key,f); if(v) rows.push("  "+lab(f.sumLabel||f.label)+": "+v); }); walk(timingFields(sn)); if(rows.length){ lines.push("", sn+":"); rows.forEach(r=>lines.push(r)); } });
   lines.push("", "Total participants requested: "+grandTotal());
+  lines.push("", "== CHI CONTACTS ==");
+  CHI_PEOPLE.forEach(p=>{ lines.push([p.name,p.title,p.region].filter(Boolean).join(", ")); lines.push("  CHI Summer Work & Travel"); lines.push("  "+p.telDisplay+"   "+p.email); lines.push(""); });
+  lines.push("Certificate holder for your insurance:"); CERT_HOLDER.split("\n").forEach(l=>lines.push("  "+l));
   return lines.join("\n");
 }
 const REVIEW_HIDE=["ControlLocations","OwnPayroll","Replacing","Layoffs","PayrollFreq","PayMethod","BankAccount","PayComments","Deductions","Notes","UnionYN","Union","UnionDues","UnionFreq","UnionInit","Groups"];
 const REVIEW_HIDE_PAGES=["business","workerscomp","onboarding"];
 function renderReview(page){
-  page.append(el("h2",{id:"pagetitle"},"Review and submit"));
+  page.append(el("h2",{id:"pagetitle"},S.submitted?"Application submitted":"Review and submit"));
   const total=grandTotal();
-  page.append(el("p",{class:"note info"},"You have requested "+total+" participant"+(total===1?"":"s")+" across "+S.locations.length+" location"+(S.locations.length===1?"":"s")+" and "+S.positions.length+" position"+(S.positions.length===1?"":"s")+". Please confirm this before submitting. Every application is reviewed by CHI's compliance department. Once approved, we will prepare your job offers and send the host agreement for signature."));
+  if(!S.submitted) page.append(el("p",{class:"note info"},"You have requested "+total+" participant"+(total===1?"":"s")+" across "+S.locations.length+" location"+(S.locations.length===1?"":"s")+" and "+S.positions.length+" position"+(S.positions.length===1?"":"s")+". Please confirm this before submitting."));
   const probs=validateAll();
-  if(probs.length) page.append(el("div",{class:"note bad"}, el("strong",{},"Before you submit: "), el("ul",{style:"margin:6px 0 0;padding-left:18px"},probs.map(x=>el("li",{},x)))));
+  if(probs.length && !S.submitted) page.append(el("div",{class:"note bad"}, el("strong",{},"Before you submit: "), el("ul",{style:"margin:6px 0 0;padding-left:18px"},probs.map(x=>el("li",{},x)))));
   const rv=el("div",{class:"review"});
   const gb=el("div",{class:"block"}, el("button",{type:"button",class:"editlink",onclick:()=>{S.page=PAGES.findIndex(p=>p.id==="grid");render();}},"Edit"), el("h4",{},"Request Numbers"));
   selectedSeasons().forEach(sn=>{
@@ -799,13 +907,27 @@ function renderReview(page){
 
   const tb2=el("div",{class:"block"}, el("button",{type:"button",class:"editlink",onclick:()=>{S.page=PAGES.findIndex(p=>p.id==="timing");render();}},"Edit"), el("h4",{},"Requested Dates"));
   const tdl=el("dl"); selectedSeasons().forEach(sn=>{ const tv=S.timing[sn]; const rows=[]; const walk=fs=>fs.forEach(f=>{ if(f.type==="row"||f.type==="group") return walk(f.fields); if(f.type==="note"||f.type==="statement"||REVIEW_HIDE.includes(f.key)) return; const v=fmtA(tv,f.key,f); if(v) rows.push([f.sumLabel||f.label,v]); }); walk(timingFields(sn)); if(rows.length) tdl.append(el("dt",{},sn),el("dd",{},rows.map(r=>r[0]+" "+r[1]).join("\n"))); }); if(tdl.children.length){ tb2.append(tdl); rv.append(tb2); }
+  rv.append(el("div",{class:"printonly"},contactCards()));
+  if(S.submitted) rv.classList.add("printonly");
   page.append(rv);
   const actions=el("div",{class:"addrow",style:"margin-top:20px"});
   const status=el("div",{id:"submitStatus",style:"width:100%"});
-  const submitBtn=el("button",{type:"button",class:"btn",disabled:probs.length>0,onclick:()=>doSubmit(status,submitBtn)},"Submit application");
-  actions.append(submitBtn, el("button",{type:"button",class:"btn quiet",onclick:()=>{ copyText(buildSummary(),()=>{ status.innerHTML=""; status.append(el("p",{class:"note ok"},"Summary copied. Paste it into an email or a document to share with your team for review.")); },()=>showSummary(status)); }},"Copy a summary for your files"), el("button",{type:"button",class:"btn quiet",onclick:()=>window.print()},"Print or save as PDF"));
-  page.append(actions,status);
-  if(S.submitted) submittedMessage(status);
+  if(S.submitted){
+    submittedMessage(status);
+    page.append(status);
+    page.append(el("div",{class:"addrow closeprint"}, el("button",{type:"button",class:"btn solid",onclick:()=>window.print()},"Print or save as PDF")));
+    page.append(el("p",{class:"help",style:"margin-top:8px"},"Printing gives you a copy of everything you submitted, along with our contact details and the certificate holder address."));
+    return;
+  }
+  const submitBtn=el("button",{type:"button",class:"btn primary",disabled:probs.length>0,onclick:()=>doSubmit(status,submitBtn)},"Submit application");
+  actions.append(submitBtn);
+  page.append(actions);
+  page.append(el("p",{class:"help",style:"margin:14px 0 6px"},"Before you submit, you can also take a copy for yourself:"));
+  const extras=el("div",{class:"addrow"});
+  extras.append(el("button",{type:"button",class:"btn quiet",onclick:()=>{ copyText(buildSummary(),()=>{ status.innerHTML=""; status.append(el("p",{class:"note ok"},"Copied. Paste it into an email or a document.")); },()=>showSummary(status)); }},"Copy as text to send to someone"), el("button",{type:"button",class:"btn quiet",onclick:()=>window.print()},"Print or save as PDF for your files"));
+  page.append(extras);
+  page.append(el("p",{class:"help",style:"margin-top:8px"},"Copy as text puts everything you entered on your clipboard, so you can paste it into an email to an owner or general manager for approval. Print or save as PDF makes a formatted copy for your own files, including our contact details and the certificate holder address."));
+  page.append(status);
 }
 function showSummary(status){ status.innerHTML=""; status.append(el("p",{class:"help"},"Copy the text below to share with your team for review."), el("div",{class:"summarybox"},buildSummary())); }
 /* ---------- CHI contacts shown after submission ---------- */
@@ -829,14 +951,46 @@ function saveContact(p,note){
 }
 function submittedMessage(status){
   status.append(el("p",{class:"note ok"},"Thank you. Your application has been submitted."));
-  status.append(el("p",{class:"help",style:"margin-top:10px"},"Every application is reviewed by CHI's compliance department. Once approved, we will prepare your job offers and send the host agreement for signature."));
-  const p2=el("p",{class:"help",style:"margin-top:8px"},"Please send your certificate of insurance and business license when they are available. You may upload them below or email them to ");
+  if(S.oversize){
+    const w=el("div",{class:"note warn"});
+    w.append(el("p",{style:"margin:0 0 8px"},"Your application is larger than one record can hold, so part of it was cut off on our side. Please send us the full file as well."));
+    w.append(el("div",{class:"addrow"}, el("button",{type:"button",class:"btn quiet",onclick:()=>{ const b=document.getElementById("saveFileBtn"); if(b) b.click(); }},"Download the full file")));
+    status.append(w);
+  }
+  const c=el("div",{class:"closing"});
+
+  c.append(el("h3",{},"What happens next"));
+  c.append(el("ol",{},[
+    el("li",{},"We add your business and your positions to the CHI job database."),
+    el("li",{},"CHI's compliance department reviews your application against Department of State requirements. This takes 3 to 5 business days."),
+    el("li",{},"We contact you if anything needs clarifying."),
+    el("li",{},"Once your application passes compliance, we send the host agreement for signature."),
+    el("li",{},"Your placement is confirmed once the agreement is signed. We then begin matching participants to your positions and send you their profiles.")
+  ]));
+
+  c.append(el("h3",{},"What we need from you"));
+  const p2=el("p",{class:"help",style:"margin-top:6px"},"Please send your certificate of insurance and business license when you have them. Your application is not final until we have both. If you already sent them, you are all set. You can upload them below or email them to ");
   p2.append(el("a",{href:"mailto:"+CONFIG.chiEmail},CONFIG.chiEmail), document.createTextNode("."));
-  status.append(p2);
-  if(CONFIG.dropboxUrl) status.append(el("div",{class:"addrow",style:"margin-top:10px"}, el("a",{class:"btn quiet",href:CONFIG.dropboxUrl,target:"_blank",rel:"noopener"},"Upload documents")));
-  status.append(contactCards());
+  c.append(p2);
+
+  if(CONFIG.dropboxUrl) c.append(el("div",{class:"addrow",style:"margin:18px 0 22px"}, el("a",{class:"btn upload",href:CONFIG.dropboxUrl,target:"_blank",rel:"noopener"},"Upload documents")));
+  const box=el("div",{class:"certbox"});
+  box.append(el("p",{style:"margin:0;font-weight:700;font-size:14px"},"Certificate holder for your insurance"));
+  box.append(el("p",{class:"help",style:"margin:4px 0 0"},"Give this to your insurance agent when they ask who to list."));
+  const addr=el("p",{class:"addr"},CERT_HOLDER);
+  box.append(addr);
+  const cnote=el("p",{class:"help"},"");
+  box.append(el("div",{class:"addrow"}, el("button",{type:"button",class:"btn solid",onclick:()=>copyText(CERT_HOLDER,
+    ()=>{ cnote.textContent="Address copied to clipboard."; },
+    ()=>{ cnote.textContent="Your browser blocked copying. Select the address above and copy it by hand."; },
+    box)},"Copy this address")), cnote);
+  c.append(box);
+
+
+  c.append(contactCards(true));
+  status.append(c);
 }
-function contactCards(){
+function contactCards(noCert){
   const wrap=el("div",{class:"contacts"});
   wrap.append(el("h3",{},"Your contact at CHI"));
   CHI_PEOPLE.forEach(p=>{
@@ -852,13 +1006,28 @@ function contactCards(){
     links.append(el("a",{href:"tel:"+p.tel},p.telDisplay), document.createTextNode("  "), el("a",{href:"mailto:"+p.email},p.email));
     left.append(links);
     const note=el("p",{class:"help"},"");
-    const btn=el("button",{type:"button",class:"btn quiet",onclick:()=>saveContact(p,note)},"Save to contacts");
-    left.append(el("div",{class:"addrow"},btn), note);
+    const btn=el("button",{type:"button",class:"btn solid",onclick:()=>saveContact(p,note)},"Save to contacts");
+    const plain=[p.name,p.title,p.region,"Cultural Homestay International","CHI Summer Work & Travel",p.telDisplay,p.email].filter(Boolean).join("\n");
+    const copyBtn=el("button",{type:"button",class:"btn solid",onclick:()=>copyText(plain,
+      ()=>{ note.textContent="Contact details copied to clipboard."; },
+      ()=>{ note.textContent="Your browser blocked copying. Select the name, phone and email above and copy them by hand."; },
+      left)},"Copy contact details");
+    left.append(el("div",{class:"addrow"},btn,copyBtn), note);
     const qr=el("div",{class:"vqr"}, el("img",{src:p.qr,alt:"QR code for "+p.name,width:"104",height:"104"}), el("span",{},"Scan with a phone"));
     card.append(left,qr); wrap.append(card);
   });
+  if(noCert) return wrap;
+  const ch=el("div",{class:"vcard certholder"});
+  const chl=el("div",{class:"vinfo"});
+  chl.append(el("p",{class:"vname"},"Certificate holder for your insurance"));
+  chl.append(el("p",{class:"vtitle"},"Give this to your insurance agent when they ask who to list."));
+  chl.append(el("p",{class:"addr",style:"margin-top:6px"},CERT_HOLDER));
+  ch.append(chl); wrap.append(ch);
   return wrap;
 }
+const CELL_LIMIT=45000;
+function capCell(t){ t=String(t); if(t.length<=CELL_LIMIT) return t;
+  return t.slice(0,CELL_LIMIT-160)+"\n\n[Cut off here. This application was too long for one record. The host business was asked to email the saved file to CHI.]"; }
 function doSubmit(status,btn){
   const summary=buildSummary();
   status.innerHTML="";
@@ -868,11 +1037,43 @@ function doSubmit(status,btn){
   }
   const f=document.getElementById("gform"); f.innerHTML=""; f.action=CONFIG.googleFormAction;
   const add=(name,val)=>{ if(!name) return; f.append(el("input",{type:"hidden",name,value:val})); };
-  add(CONFIG.entries.business,S.a.LegalName||""); add(CONFIG.entries.contact,[S.a.P1Name,S.a.P1Email].filter(Boolean).join(" ")); add(CONFIG.entries.seasons,selectedSeasons().join(", ")); add(CONFIG.entries.total,String(grandTotal())); add(CONFIG.entries.summary,summary); add(CONFIG.entries.json,JSON.stringify({a:S.a,locations:S.locations,positions:S.positions,grid:S.grid}));
+  const json=JSON.stringify({a:S.a,locations:S.locations,positions:S.positions,grid:S.grid,timing:S.timing});
+  S.oversize = summary.length>CELL_LIMIT || json.length>CELL_LIMIT;
+  add(CONFIG.entries.business,S.a.LegalName||""); add(CONFIG.entries.contact,[S.a.P1Name,S.a.P1Email].filter(Boolean).join(" ")); add(CONFIG.entries.seasons,selectedSeasons().join(", ")); add(CONFIG.entries.total,String(grandTotal())); add(CONFIG.entries.summary,capCell(summary)); add(CONFIG.entries.json,capCell(json));
+  if(navigator.onLine===false){ offlineMessage(status,btn); return; }
   btn.disabled=true; btn.textContent="Sending";
-  let done=false; const finish=()=>{ if(done) return; done=true; S.submitted=true; save(); status.innerHTML=""; submittedMessage(status); btn.disabled=false; btn.textContent="Submit application"; };
-  document.getElementById("gframe").onload=finish; setTimeout(finish,2500);
-  f.submit();
+  status.append(el("p",{class:"help",id:"sendNote"},"Sending your application. Please keep this page open."));
+  const slow=setTimeout(()=>{ const n=document.getElementById("sendNote"); if(n) n.textContent="Still sending. This can take a few seconds on a slow connection. Please keep this page open."; },4000);
+  const frame=document.getElementById("gframe");
+  let settled=false;
+  const settle=ok=>{ if(settled) return; settled=true; frame.onload=null; clearTimeout(timer); clearTimeout(slow);
+    btn.disabled=false; btn.textContent="Submit application";
+    if(ok){ S.submitted=true; S.attempts=0; save(); render(); }
+    else { S.attempts=(S.attempts||0)+1; save(); unconfirmedMessage(status,btn); } };
+  frame.onload=()=>settle(true);
+  const timer=setTimeout(()=>settle(false),15000);
+  try{ f.submit(); }catch(e){ settle(false); }
+}
+function offlineMessage(status,btn){
+  status.innerHTML="";
+  status.append(el("p",{class:"note bad"},"Your device is not connected to the internet, so nothing was sent. Your answers are saved on this page. Reconnect and press Submit application again."));
+}
+function unconfirmedMessage(status,btn){
+  status.innerHTML="";
+  const box=el("div",{class:"note bad"});
+  box.append(el("p",{style:"margin:0 0 8px;font-weight:700"},"We could not confirm that your application reached CHI."));
+  box.append(el("p",{style:"margin:0 0 8px"},"Nothing you entered is lost. It is all still on this page. It may have gone through, so please do not assume it failed."));
+  const steps=el("ol",{style:"margin:0 0 10px;padding-left:20px"});
+  steps.append(el("li",{},"Press Try again."));
+  steps.append(el("li",{},"If it does not confirm the second time, press Download my application and email the file to chijennifer@chinet.org. We will enter it for you."));
+  box.append(steps);
+  const row=el("div",{class:"addrow"});
+  row.append(el("button",{type:"button",class:"btn",onclick:()=>doSubmit(status,btn)},"Try again"));
+  row.append(el("button",{type:"button",class:"btn quiet",onclick:()=>{ const b=document.getElementById("saveFileBtn"); if(b) b.click(); }},"Download my application"));
+  const mail=el("a",{class:"btn quiet",href:"mailto:"+CONFIG.chiEmail+"?subject="+encodeURIComponent("Host enrollment, "+(S.a.LegalName||"application"))},"Email CHI");
+  row.append(mail);
+  box.append(row);
+  status.append(box);
 }
 
 /* ---------- Validation ---------- */
@@ -900,7 +1101,7 @@ function validateAll(){
 }
 
 /* ---------- Navigation ---------- */
-document.getElementById("nextBtn").addEventListener("click",()=>{ if(!validatePage()) return; if(S.page<PAGES.length-1){ S.page++; render(); } });
+document.getElementById("nextBtn").addEventListener("click",()=>{ if(S.page<PAGES.length-1){ S.page++; render(); } });
 document.getElementById("backBtn").addEventListener("click",()=>{ if(S.page>0){ S.page--; render(); } });
 load();
 if(S.page>=PAGES.length) S.page=0;

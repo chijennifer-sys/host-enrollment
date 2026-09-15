@@ -47,6 +47,8 @@ header.top h1{font-size:28px;line-height:1.2;margin:0;font-weight:700;text-wrap:
 .help{color:var(--muted);font-size:14px;line-height:1.5;max-width:66ch;margin:0}
 .help.rule{color:var(--ink);font-weight:700}
 input[type=text],input[type=email],input[type=url],input[type=tel],input[type=number],input[type=date],select,textarea{font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line-strong);border-radius:6px;padding:9px 11px;width:100%;max-width:100%}
+select{-webkit-appearance:none;appearance:none;padding-right:34px;line-height:1.55;height:auto;background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%233F4C5C' stroke-width='2' d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-size:12px 8px}
+select::-ms-expand{display:none}
 textarea{min-height:76px;resize:vertical}
 input[type=number]{max-width:160px;font-family:var(--mono)}
 .money-input{position:relative;display:inline-flex;align-items:center;max-width:160px}
@@ -69,6 +71,7 @@ details.season[open] summary .chev::before{content:"\25B4"}
 details.season:not([open]) summary .chev::before{content:"\25BE"}
 .addr{margin:0;font-size:15px;line-height:1.5;white-space:pre-line}
 .note{border-radius:8px;padding:12px 14px;font-size:14px;line-height:1.5}
+.fields>.note{margin-block:0}
 .note.warn{background:var(--warn-soft);color:var(--warn)}
 .note.ok{background:var(--ok-soft);color:var(--ok)}
 .note.info{background:var(--accent-soft);color:var(--ink)}
@@ -171,14 +174,31 @@ footer.nav .spacer{flex:1;color:var(--muted);font-size:13px}
 footer.nav #laterBtn{font-size:13px;padding:8px 12px}
 @media (max-width:520px){footer.nav .spacer{display:none}}
 @media print{
-  body{background:#fff;padding:0;border-top:6px solid var(--accent);font-size:12px}
-  .steps,footer.nav,.editlink,.addrow,#submitStatus,.note.bad{display:none!important}
+  body{background:#fff;padding:0;border-top:6px solid var(--accent);font-size:12.5px;line-height:1.5;color:#000}
+  .steps,footer.nav,.editlink,.addrow,#submitStatus,.note.bad,.stepnote,.screenonly,.page .intro{display:none!important}
   .page{border:none;padding:0;animation:none}
-  .review .block,.money{break-inside:avoid;border-color:#bbb}
+  header.top{padding-block:0 8px;gap:4px 14px}
+  header.top img{width:54px}
+  header.top h1{font-size:20px}
+  header.top .eyebrow{font-size:11px}
+  .page h2{font-size:16px;margin:14px 0 10px}
+  .note.info{border:none;background:none;padding:0;margin:0 0 12px;font-size:12.5px}
+  .review{gap:10px}
+  .review .block,.money{break-inside:auto;border-color:#bbb;padding:10px 12px}
+  .review .block h4,.money h3{break-after:avoid;font-size:13px;margin-bottom:6px}
+  .review dl{grid-template-columns:minmax(150px,34%) 1fr;gap:6px 14px;font-size:12.5px}
+  .review dt,.review dd{break-inside:avoid}
+  .review dt{color:#333}
+  .money .mline{margin:2px 0}
+  .contacts h3,.vlead{break-after:avoid}
+  .contacts h3{font-size:13px}
+  .contacts .vcard{break-inside:avoid;padding:10px 12px}
+  .vqr img{width:76px;height:76px}
   .printonly{display:block}
   .gridwrap{border-color:#bbb}
-  header.top img{width:60px}
+  .grid th,.grid td{font-size:12px;padding:5px 7px}
   a{color:inherit;text-decoration:none}
+  @page{margin:14mm 12mm}
 }
 @media (max-width:520px){.page{padding:20px 16px}.review dl{grid-template-columns:1fr}.review dt{margin-top:6px}}
 @media (prefers-reduced-motion:no-preference){.page{animation:fade .18s ease-out}@keyframes fade{from{opacity:.6;transform:translateY(3px)}to{opacity:1;transform:none}}}
@@ -562,7 +582,7 @@ function renderField(f, obj, ctx, idPrefix){
     wrap.append(el("div",{class:"addrow",style:"margin-top:10px"},copy), note);
     return wrap;
   }
-  if(f.type==="upload"){ if(!CONFIG.dropboxUrl) return el("span",{hidden:true}); const wrap=el("div",{class:"field"}); if(f.label) wrap.append(el("div",{class:"q"},f.label)); if(f.help) wrap.append(el("p",{class:"help"},f.help)); wrap.append(el("div",{class:"addrow"}, el("a",{class:"btn quiet",href:CONFIG.dropboxUrl,target:"_blank",rel:"noopener"},"Upload documents")));
+  if(f.type==="upload"){ if(!CONFIG.dropboxUrl) return el("span",{hidden:true}); const wrap=el("div",{class:"field"}); if(f.label) wrap.append(el("div",{class:"q"},f.label)); if(f.help) wrap.append(el("p",{class:"help"},f.help)); wrap.append(el("div",{class:"addrow",style:"margin:14px 0 12px"}, el("a",{class:"btn upload",href:CONFIG.dropboxUrl,target:"_blank",rel:"noopener"},"Upload documents")));
     wrap.append(el("p",{class:"help"},"This opens Dropbox in a separate tab. When you have finished uploading, close that tab to come back here. Your answers are saved.")); return wrap; }
   if(f.type==="ack"){ const id=idPrefix+"_"+f.key; const wrap=el("div",{class:"field",id:"w_"+id}); const box=el("div",{class:"ack"}); box.append(el("p",{class:"t"}, el("strong",{},f.label+". "), f.text)); box.append(el("label",{class:"choice",for:id}, el("input",{type:"checkbox",id,checked:obj[f.key]==="I understand",onchange:e=>{ obj[f.key]=e.target.checked?"I understand":""; save(); }}), "I understand")); wrap.append(box, el("p",{class:"err",hidden:true})); wrap._def=f; wrap._obj=obj; wrap._ctx=ctx; return wrap; }
   if(f.type==="row"){ const r=el("div",{class:"grid2"}); f.fields.forEach(x=>r.append(renderField(x,obj,ctx,idPrefix))); return r; }
@@ -783,6 +803,7 @@ const usDate = v => { const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v)); if(!m
 function fmtA(a,key,f){ const v=a[key]; if(Array.isArray(v)) return v.join(", "); if(v==null) return "";
   if(f&&f.money){ const n=parseFloat(v); if(!isNaN(n)) return "$"+n.toFixed(2); }
   return usDate(v)||String(v); }
+function collectRows(fields,obj){ const rows=[]; const walk=fs=>fs.forEach(f=>{ if(f.type==="group"||f.type==="row") return walk(f.fields); if(f.showIf && !f.showIf(obj)) return; if(!f.key) return; if(f.type==="computed") obj[f.key]=f.compute(obj,S.a); const v=fmtA(obj,f.key,f); if(v==="") return; rows.push([f.sumLabel||f.label,v,f.key]); }); walk(fields); return rows; }
 function collectPageRows(p,obj){ const rows=[]; const walk=fs=>fs.forEach(f=>{ if(f.type==="group"||f.type==="row") return walk(f.fields); if(f.showIf && !f.showIf(obj)) return; if(f.type==="seasons"){ rows.push(["Which seasons are you interested in?",(obj.WhichSeasons||[]).join(", "),"WhichSeasons"]); return; } if(f.type==="ack"){ rows.push([f.label, f.text+"\n"+(obj[f.key]||"Not acknowledged"), f.key]); return; } if(!f.key) return; if(f.type==="computed") obj[f.key]=f.compute(obj,S.a); rows.push([f.sumLabel||f.label,fmtA(obj,f.key,f),f.key]); }); walk(p.fields); return rows; }
 function costLines(){
   const usd=v=>{ const n=parseFloat(v); return isNaN(n)?"":"$"+n.toFixed(2); };
@@ -887,23 +908,21 @@ function renderReview(page){
     const dl=el("dl"); rows.forEach(([q,v])=>dl.append(el("dt",{},q),el("dd",{},v)));
     b.append(dl); rv.append(b); });
 
-  // housing move in and move out, so the employer sees the arrival window before submitting
-  const mv=[];
-  S.locations.forEach((l,li)=>{ if(!HOUSING_SHOW(l.Housing)) return;
-    (l.housing||[]).forEach((h,hi)=>{
-      const before=String(h.DaysBefore||"").trim(), after=String(h.DaysAfter||"").trim();
-      if(!before && !after) return;
-      const who=(h.HName&&h.HName.trim()) ? h.HName.trim() : ("Housing "+(hi+1));
-      const parts=[];
-      if(before) parts.push("Move in up to "+before+" day"+(before==="1"?"":"s")+" before the start date");
-      if(after) parts.push("May stay "+after+" day"+(after==="1"?"":"s")+" after the end date");
-      mv.push([who+" ("+locName(l,li)+")", parts.join(". ")+"."]);
-    }); });
-  if(mv.length){
-    const hb=el("div",{class:"block"}, el("button",{type:"button",class:"editlink",onclick:()=>{S.page=PAGES.findIndex(p=>p.custom==="locations");render();}},"Edit"), el("h4",{},"Move in and move out"));
-    const hdl=el("dl"); mv.forEach(([q,v])=>hdl.append(el("dt",{},q),el("dd",{},v)));
-    hb.append(hdl); rv.append(hb);
-  }
+  // each location, with its housing, so the employer can check what they entered
+  const blockOf=(title,rows,pageId)=>{ if(!rows.length) return null;
+    const bl=el("div",{class:"block"}, pageId?el("button",{type:"button",class:"editlink",onclick:()=>{S.page=PAGES.findIndex(q=>q.custom===pageId);render();}},"Edit"):null, el("h4",{},title));
+    const d=el("dl"); rows.forEach(([q,v])=>d.append(el("dt",{},q),el("dd",{},v))); bl.append(d); return bl; };
+  S.locations.forEach((loc,i)=>{
+    const bl=blockOf(locName(loc,i),collectRows(LOC_FIELDS,loc),"locations");
+    if(bl) rv.append(bl);
+    if(HOUSING_SHOW(loc.Housing)) (loc.housing||[]).forEach((h,j)=>{
+      const hn=(h.HName&&h.HName.trim())?h.HName.trim():("Housing "+(j+1));
+      const hb=blockOf(hn+" ("+locName(loc,i)+")",collectRows(HOUSING_FIELDS,h),"locations");
+      if(hb) rv.append(hb); });
+  });
+  S.positions.forEach((pos,i)=>{
+    const bl=blockOf(posName(pos,i),collectRows(POS_FIELDS,pos),"positions");
+    if(bl) rv.append(bl); });
 
   const tb2=el("div",{class:"block"}, el("button",{type:"button",class:"editlink",onclick:()=>{S.page=PAGES.findIndex(p=>p.id==="timing");render();}},"Edit"), el("h4",{},"Requested Dates"));
   const tdl=el("dl"); selectedSeasons().forEach(sn=>{ const tv=S.timing[sn]; const rows=[]; const walk=fs=>fs.forEach(f=>{ if(f.type==="row"||f.type==="group") return walk(f.fields); if(f.type==="note"||f.type==="statement"||REVIEW_HIDE.includes(f.key)) return; const v=fmtA(tv,f.key,f); if(v) rows.push([f.sumLabel||f.label,v]); }); walk(timingFields(sn)); if(rows.length) tdl.append(el("dt",{},sn),el("dd",{},rows.map(r=>r[0]+" "+r[1]).join("\n"))); }); if(tdl.children.length){ tb2.append(tdl); rv.append(tb2); }
@@ -916,17 +935,17 @@ function renderReview(page){
     submittedMessage(status);
     page.append(status);
     page.append(el("div",{class:"addrow closeprint"}, el("button",{type:"button",class:"btn solid",onclick:()=>window.print()},"Print or save as PDF")));
-    page.append(el("p",{class:"help",style:"margin-top:8px"},"Printing gives you a copy of everything you submitted, along with our contact details and the certificate holder address."));
+    page.append(el("p",{class:"help screenonly",style:"margin-top:8px"},"Printing gives you a copy of everything you submitted, along with our contact details and the certificate holder address."));
     return;
   }
   const submitBtn=el("button",{type:"button",class:"btn primary",disabled:probs.length>0,onclick:()=>doSubmit(status,submitBtn)},"Submit application");
   actions.append(submitBtn);
   page.append(actions);
-  page.append(el("p",{class:"help",style:"margin:14px 0 6px"},"Before you submit, you can also take a copy for yourself:"));
+  page.append(el("p",{class:"help screenonly",style:"margin:14px 0 6px"},"Before you submit, you can also take a copy for yourself:"));
   const extras=el("div",{class:"addrow"});
   extras.append(el("button",{type:"button",class:"btn quiet",onclick:()=>{ copyText(buildSummary(),()=>{ status.innerHTML=""; status.append(el("p",{class:"note ok"},"Copied. Paste it into an email or a document.")); },()=>showSummary(status)); }},"Copy as text to send to someone"), el("button",{type:"button",class:"btn quiet",onclick:()=>window.print()},"Print or save as PDF for your files"));
   page.append(extras);
-  page.append(el("p",{class:"help",style:"margin-top:8px"},"Copy as text puts everything you entered on your clipboard, so you can paste it into an email to an owner or general manager for approval. Print or save as PDF makes a formatted copy for your own files, including our contact details and the certificate holder address."));
+  page.append(el("p",{class:"help screenonly",style:"margin-top:8px"},"Copy as text puts everything you entered on your clipboard, so you can paste it into an email to an owner or general manager for approval. Print or save as PDF makes a formatted copy for your own files, including our contact details and the certificate holder address."));
   page.append(status);
 }
 function showSummary(status){ status.innerHTML=""; status.append(el("p",{class:"help"},"Copy the text below to share with your team for review."), el("div",{class:"summarybox"},buildSummary())); }

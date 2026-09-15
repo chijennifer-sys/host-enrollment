@@ -145,6 +145,8 @@ footer.nav .spacer{flex:1;color:var(--muted);font-size:13px}
 .contacts h3{margin:0;font-size:16px;font-weight:700}
 .vlead{margin:6px 0 -4px;font-size:14px;color:var(--muted)}
 .vcard{border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.vcard .vinfo{order:1}
+.vcard .vqr{order:2}
 .vinfo{flex:1 1 260px;display:flex;flex-direction:column;gap:2px}
 .vname{margin:0;font-weight:700;font-size:15px}
 .vtitle{margin:0;font-size:14px;color:var(--muted)}
@@ -179,7 +181,7 @@ footer.nav #laterBtn{font-size:13px;padding:8px 12px}
   .page{border:none;padding:0;animation:none}
   header.top{padding-block:0 8px;gap:4px 14px}
   header.top img{width:54px}
-  header.top h1{font-size:20px}
+  header.top h1{display:none}
   header.top .eyebrow{font-size:11px}
   .page h2{font-size:16px;margin:14px 0 10px}
   .note.info{border:none;background:none;padding:0;margin:0 0 12px;font-size:12.5px}
@@ -190,6 +192,15 @@ footer.nav #laterBtn{font-size:13px;padding:8px 12px}
   .review dt,.review dd{break-inside:avoid}
   .review dt{color:#333}
   .money .mline{margin:2px 0}
+  .printhead{display:block;border-bottom:2px solid var(--accent);padding-bottom:8px;margin:0 0 14px}
+  .printhead .ph-kicker{margin:0;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#555}
+  .printhead .ph-name{margin:2px 0 0;font-size:17px;font-weight:700}
+  .printhead .ph-sub{margin:2px 0 0;font-size:11.5px;color:#444}
+  #pagetitle{display:none}
+  .contacts .vcard{display:block;overflow:hidden}
+  .vqr{float:right;margin:0 0 6px 12px;text-align:center}
+  .vqr span{font-size:9px;color:#666;display:block}
+  .ack .t,.review dd{font-size:11.8px}
   .contacts h3,.vlead{break-after:avoid}
   .contacts h3{font-size:13px}
   .contacts .vcard{break-inside:avoid;padding:10px 12px}
@@ -881,8 +892,26 @@ function buildSummary(){
 }
 const REVIEW_HIDE=["ControlLocations","OwnPayroll","Replacing","Layoffs","PayrollFreq","PayMethod","BankAccount","PayComments","Deductions","Notes","UnionYN","Union","UnionDues","UnionFreq","UnionInit","Groups"];
 const REVIEW_HIDE_PAGES=["business","workerscomp","onboarding"];
+function printHead(){
+  const d=new Date(); const pad=x=>String(x).padStart(2,"0");
+  const when=pad(d.getMonth()+1)+"/"+pad(d.getDate())+"/"+d.getFullYear();
+  const name=(S.a.LegalName||"").trim(), dba=(S.a.DBA||"").trim();
+  const h=el("div",{class:"printhead printonly"});
+  h.append(el("p",{class:"ph-kicker"},"Host Business Enrollment"));
+  h.append(el("p",{class:"ph-name"}, name || dba || "Host business"));
+  if(dba && name && dba!==name) h.append(el("p",{class:"ph-sub"},"Doing business as "+dba));
+  const bits=[];
+  if(selectedSeasons().length) bits.push(selectedSeasons().join(", "));
+  bits.push(grandTotal()+" participant"+(grandTotal()===1?"":"s")+" requested");
+  bits.push(S.locations.length+" location"+(S.locations.length===1?"":"s"));
+  bits.push(S.positions.length+" position"+(S.positions.length===1?"":"s"));
+  h.append(el("p",{class:"ph-sub"},bits.join("  |  ")));
+  h.append(el("p",{class:"ph-sub"},(S.submitted?"Submitted to CHI ":"Draft, not yet submitted. Printed ")+when));
+  return h;
+}
 function renderReview(page){
   page.append(el("h2",{id:"pagetitle"},S.submitted?"Application submitted":"Review and submit"));
+  page.append(printHead());
   const total=grandTotal();
   if(!S.submitted) page.append(el("p",{class:"note info"},"You have requested "+total+" participant"+(total===1?"":"s")+" across "+S.locations.length+" location"+(S.locations.length===1?"":"s")+" and "+S.positions.length+" position"+(S.positions.length===1?"":"s")+". Please confirm this before submitting."));
   const probs=validateAll();
@@ -903,6 +932,7 @@ function renderReview(page){
   const money=el("div",{class:"money"}, el("h3",{},"What you told us about other costs"));
   costLines().forEach(t=>money.append(el("p",{class:"mline"},t)));
   rv.append(money);
+  let rulesBlock=null;
   const isAckKey=k=>!!k&&k.indexOf("Ack")===0;
   const ACK_ORDER_R=["AckTerms","AckProblems","AckChanges","AckStatus","AckTaxes"];
   PAGES.forEach((p,i)=>{
@@ -913,7 +943,7 @@ function renderReview(page){
     if(!rows.length) return;
     const b=el("div",{class:"block"}, p.id==="compliance"?null:el("button",{type:"button",class:"editlink",onclick:()=>{S.page=i;render();}},"Edit"), el("h4",{},p.title));
     const dl=el("dl"); rows.forEach(([q,v])=>dl.append(el("dt",{},q),el("dd",{},v)));
-    b.append(dl); rv.append(b); });
+    b.append(dl); if(p.id==="compliance") rulesBlock=b; else rv.append(b); });
 
   // each location, with its housing, so the employer can check what they entered
   const blockOf=(title,rows,pageId)=>{ if(!rows.length) return null;
@@ -933,6 +963,7 @@ function renderReview(page){
 
   const tb2=el("div",{class:"block"}, el("button",{type:"button",class:"editlink",onclick:()=>{S.page=PAGES.findIndex(p=>p.id==="timing");render();}},"Edit"), el("h4",{},"Requested Dates"));
   const tdl=el("dl"); selectedSeasons().forEach(sn=>{ const tv=S.timing[sn]; const rows=[]; const walk=fs=>fs.forEach(f=>{ if(f.type==="row"||f.type==="group") return walk(f.fields); if(f.type==="note"||f.type==="statement"||REVIEW_HIDE.includes(f.key)) return; const v=fmtA(tv,f.key,f); if(v) rows.push([f.sumLabel||f.label,v]); }); walk(timingFields(sn)); if(rows.length) tdl.append(el("dt",{},sn),el("dd",{},rows.map(r=>r[0]+" "+r[1]).join("\n"))); }); if(tdl.children.length){ tb2.append(tdl); rv.append(tb2); }
+  if(rulesBlock) rv.append(rulesBlock);
   rv.append(el("div",{class:"printonly"},contactCards()));
   if(S.submitted) rv.classList.add("printonly");
   page.append(rv);
@@ -941,8 +972,13 @@ function renderReview(page){
   if(S.submitted){
     submittedMessage(status);
     page.append(status);
-    page.append(el("div",{class:"addrow closeprint"}, el("button",{type:"button",class:"btn solid",onclick:()=>window.print()},"Print or save as PDF")));
-    page.append(el("p",{class:"help screenonly",style:"margin-top:8px"},"Printing gives you a copy of everything you submitted, along with our contact details and the certificate holder address."));
+    page.append(el("h3",{class:"screenonly",style:"margin:26px 0 6px;font-size:16px"},"Keep a copy"));
+    page.append(el("p",{class:"help screenonly",style:"margin:0 0 12px"},"We recommend you take both. If anything ever goes wrong on our side, send us the file and we can restore your application without you typing it again."));
+    const keep=el("div",{class:"addrow closeprint",style:"margin-top:0"});
+    keep.append(el("button",{type:"button",class:"btn solid",onclick:()=>{ const bb=document.getElementById("saveFileBtn"); if(bb) bb.click(); }},"Download a copy of my application"));
+    keep.append(el("button",{type:"button",class:"btn solid",onclick:()=>window.print()},"Print or save as PDF"));
+    page.append(keep);
+    page.append(el("p",{class:"help screenonly",style:"margin-top:10px"},"The download is a small file you keep on your computer. Opening this page again and pressing Open a saved file brings your whole application back. The printout is a readable copy for your records, with our contact details and the certificate holder address."));
     return;
   }
   const submitBtn=el("button",{type:"button",class:"btn primary",disabled:probs.length>0,onclick:()=>doSubmit(status,submitBtn)},"Submit application");
@@ -1040,7 +1076,7 @@ function contactCards(noCert){
       left)},"Copy contact details");
     left.append(el("div",{class:"addrow"},btn,copyBtn), note);
     const qr=el("div",{class:"vqr"}, el("img",{src:p.qr,alt:"QR code for "+p.name,width:"104",height:"104"}), el("span",{},"Scan with a phone"));
-    card.append(left,qr); wrap.append(card);
+    card.append(qr,left); wrap.append(card);
   });
   if(noCert) return wrap;
   const ch=el("div",{class:"vcard certholder"});

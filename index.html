@@ -545,8 +545,15 @@ function migrateAll(){ normalizeState();
   (S.locations||[]).forEach(l=>{ migrateRole(l,"ContactChoice"); (l.housing||[]).forEach(h=>migrateRole(h,"HContactChoice")); });
   (S.locations||[]).forEach(l=>(l.housing||[]).forEach(h=>{ if(typeof h.MoveInOut==="string"&&h.MoveInOut.trim()&&!h.MoveNotes){ h.MoveNotes=h.MoveInOut; } delete h.MoveInOut; })); if(typeof S.a.Platform==="string"){ const t=S.a.Platform.trim(); S.a.Platform=t?["Other"]:[]; if(t) S.a.PlatformOther=t; } (S.locations||[]).forEach(l=>{ if(Array.isArray(l.ClosedDays)&&!l.OpenDays){ l.OpenDays=DAYS.filter(d=>!l.ClosedDays.includes(d)); } delete l.ClosedDays; }); (S.positions||[]).forEach(p=>{ if(p.Tipped==="Yes"){ p.Tipped=p.TipsPooled==="Yes"?"Yes, tips are pooled":"Yes, tips are kept individually"; } delete p.TipsPooled; }); migrate(S.a); (S.locations||[]).forEach(l=>{ migrate(l); (l.housing||[]).forEach(migrate); }); (S.positions||[]).forEach(migrate); Object.values(S.timing||{}).forEach(migrate); }
 function load(){ try{ const raw=localStorage.getItem(KEY); if(raw){ const d=JSON.parse(raw); if(d&&d.a) S=Object.assign(S,d); } }catch(e){} S.timing=S.timing||{Winter:{},Spring:{},Summer:{}}; migrateAll(); }
-let saveTimer;
-function save(){ clearTimeout(saveTimer); saveTimer=setTimeout(()=>{ try{ localStorage.setItem(KEY,JSON.stringify(S)); document.getElementById("saveNote").textContent="Draft saved on this device"; }catch(e){} },300); }
+let saveTimer=null, lastWrite=0;
+function writeNow(){ if(saveTimer){ clearTimeout(saveTimer); saveTimer=null; }
+  try{ localStorage.setItem(KEY,JSON.stringify(S)); const n=document.getElementById("saveNote"); if(n) n.textContent="Draft saved on this device"; }catch(e){}
+  lastWrite=Date.now(); }
+function save(){ if(Date.now()-lastWrite>1500){ writeNow(); return; }
+  if(saveTimer) clearTimeout(saveTimer); saveTimer=setTimeout(writeNow,300); }
+window.addEventListener("pagehide",writeNow);
+window.addEventListener("beforeunload",writeNow);
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden") writeNow(); });
 const selectedSeasons = () => SEASONS.filter(s=>(S.a.WhichSeasons||[]).includes(s));
 const num = v => { const n=parseFloat(v); return isNaN(n)?0:n; };
 const cnt = v => { const n=parseInt(v,10); return isNaN(n)||n<0?0:n; };

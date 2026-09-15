@@ -1039,7 +1039,8 @@ function doSubmit(status,btn){
   const add=(name,val)=>{ if(!name) return; f.append(el("input",{type:"hidden",name,value:val})); };
   const json=JSON.stringify({a:S.a,locations:S.locations,positions:S.positions,grid:S.grid,timing:S.timing});
   S.oversize = summary.length>CELL_LIMIT || json.length>CELL_LIMIT;
-  add(CONFIG.entries.business,S.a.LegalName||""); add(CONFIG.entries.contact,[S.a.P1Name,S.a.P1Email].filter(Boolean).join(" ")); add(CONFIG.entries.seasons,selectedSeasons().join(", ")); add(CONFIG.entries.total,String(grandTotal())); add(CONFIG.entries.summary,capCell(summary)); add(CONFIG.entries.json,capCell(json));
+  const tidy=v=>String(v==null?"":v).replace(/\s+/g," ").trim();
+  add(CONFIG.entries.business,tidy(S.a.LegalName)||tidy(S.a.DBA)); add(CONFIG.entries.contact,[tidy(S.a.P1Name),tidy(S.a.P1Email)].filter(Boolean).join(" ")); add(CONFIG.entries.seasons,selectedSeasons().join(", ")); add(CONFIG.entries.total,String(grandTotal())); add(CONFIG.entries.summary,capCell(summary)); add(CONFIG.entries.json,capCell(json));
   if(navigator.onLine===false){ offlineMessage(status,btn); return; }
   btn.disabled=true; btn.textContent="Sending";
   status.append(el("p",{class:"help",id:"sendNote"},"Sending your application. Please keep this page open."));

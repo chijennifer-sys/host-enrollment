@@ -282,6 +282,7 @@ const CONFIG = {
 };
 
 const STATES = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming","District of Columbia"];
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const YN = ["Yes","No"];
 const AG_L="Primary point of contact";
 const AD_L="Secondary point of contact";
@@ -333,6 +334,17 @@ const PAGES = [
    TA("Cultural","What cultural activities or experiences do you offer participants?",{help:"The Summer Work Travel program is a cultural exchange with a work component.",placeholder:"It can be as simple as a staff appreciation day or a pizza party."}),
    R("OtherSponsors","Do you work with other J-1 sponsors?",YN,{help:"This is common and does not affect your application. We ask because every participant must be scheduled at least 32 hours per week."}),
    T("OtherSponsorCount","How many participants do you expect from other sponsors this season?",{type:"number",step:"1",sumLabel:"Participants expected from other sponsors",help:"An estimate is fine.",showIf:a=>a.OtherSponsors==="Yes"}),
+   T("EnjoyCountry","Is there a country you really enjoy working with?",{help:"Optional. If participants from a particular country have worked out well for you, tell us.",placeholder:"Bulgaria",sumLabel:"Preferred countries"}),
+   T("AvoidCountry","Is there a country you would prefer not to work with?",{help:"Optional. This does not commit CHI to anything, but it helps us match well.",placeholder:"Leave blank if you have no preference",sumLabel:"Undesirable countries"}),
+   { type:"statement", text:"The Department of State requires every host business to show that the positions offered are seasonal. The next few questions cover your peak period." },
+   { key:"SeasonStartMonth", type:"select", label:"What month does your busy season begin?", choices:MONTHS, sumLabel:"Seasonality beginning month" },
+   { key:"SeasonEndMonth", type:"select", label:"What month does your busy season end?", choices:MONTHS, sumLabel:"Seasonality ending month" },
+   { key:"SalesIncrease", type:"select", label:"How much do sales increase during that period?", choices:["25%","50%","75%","100%"], sumLabel:"Sales increase percentage" },
+   T("SeasonalStaff","How many seasonal staff do you add during that period in total?",{type:"number",step:"1",help:"Count everyone you add for the season, not only J-1 participants.",sumLabel:"Number of seasonal staff for the said period"}),
+   { type:"note", text:"What drives the increase? Give up to three." },
+   T("Factor1","Reason 1",{placeholder:"Opening of outdoor pools",sumLabel:"Increase factor 1"}),
+   T("Factor2","Reason 2",{placeholder:"Festivals and local events",sumLabel:"Increase factor 2"}),
+   T("Factor3","Reason 3",{placeholder:"Summer vacation season",sumLabel:"Increase factor 3"}),
  ]},
  { id:"contacts", title:"Contacts", fields:[
    { type:"statement", text:"Please identify the staff members CHI and participants will work with. One person may fill all roles. Many businesses assign a single contact, while larger businesses divide these responsibilities." },

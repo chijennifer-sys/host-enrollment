@@ -334,6 +334,7 @@ const PAGES = [
    TA("Cultural","What cultural activities or experiences do you offer participants?",{help:"The Summer Work Travel program is a cultural exchange with a work component.",placeholder:"It can be as simple as a staff appreciation day or a pizza party."}),
    R("OtherSponsors","Do you work with other J-1 sponsors?",YN,{help:"This is common and does not affect your application. We ask because every participant must be scheduled at least 32 hours per week."}),
    T("OtherSponsorCount","How many participants do you expect from other sponsors this season?",{type:"number",step:"1",sumLabel:"Participants expected from other sponsors",help:"An estimate is fine.",showIf:a=>a.OtherSponsors==="Yes"}),
+   R("AdvertisedAmerican","Have you advertised these vacancies to American workers?",YN,{help:"The Department of State requires sponsors to confirm that host businesses recruit locally before filling seasonal openings with exchange participants (22 CFR 62.32).",sumLabel:"Has the host advertised the vacancies to American workers?"}),
    T("EnjoyCountry","Is there a country you really enjoy working with?",{help:"Optional. If participants from a particular country have worked out well for you, tell us.",placeholder:"Bulgaria",sumLabel:"Preferred countries"}),
    T("AvoidCountry","Is there a country you would prefer not to work with?",{help:"Optional. This does not commit CHI to anything, but it helps us match well.",placeholder:"Leave blank if you have no preference",sumLabel:"Undesirable countries"}),
    { type:"statement", text:"The Department of State requires every host business to show that the positions offered are seasonal. The next few questions cover your peak period." },
@@ -448,6 +449,9 @@ const LOC_FIELDS = [
 ];
 const HOUSING_SHOW = h => h==="We provide it directly" || h==="Through a landlord or housing provider we arrange";
 const HOUSING_FIELDS = [
+  R("HContract","Do participants sign a separate housing agreement or lease?",YN),
+  { type:"note", text:"If you already have a prepared housing agreement, lease, or move in instructions, upload it here and answer the questions below as briefly as you like. We will use your document for the details rather than asking you to retype them.", showIf:h=>h.HContract==="Yes" },
+  { type:"upload", label:"Housing agreement or lease", showIf:h=>h.HContract==="Yes" },
   T("HName","Housing name",{placeholder:"Main Street Apartments, Unit 2"}),
   T("HStreet","Street address"),
   { type:"row", fields:[ T("HCity","City"), { key:"HState", type:"select", label:"State", choices:STATES }, T("HZip","ZIP") ]},
@@ -456,11 +460,13 @@ const HOUSING_FIELDS = [
   T("LandlordName","Landlord name",{showIf:h=>h.HContactChoice==="Landlord"}),
   { type:"row", fields:[ T("LandlordPhone","Phone",{type:"tel",showIf:h=>h.HContactChoice==="Landlord"}), T("LandlordEmail","Email",{type:"email",showIf:h=>h.HContactChoice==="Landlord"}) ]},
   R("HType","Type of housing",["House","Apartment","Dormitory","Motel or hotel rooms","Other"]),
+  R("HOnSite","Is this housing at the work site?",YN),
+  { type:"row", fields:[ T("Bedrooms","How many bedrooms?",{type:"number",step:"1"}), T("BathCount","How many bathrooms?",{type:"number",step:"1"}) ]},
   T("PerRoom","Participants per room",{placeholder:"4 per room."}),
   R("SingleGender","Are bedrooms single-gender?",YN),
   R("Beds","Type of beds",["Single beds","Bunk beds","Other"],{help:"Department of State housing guidance requires a separate bed for each participant."}),
   T("BedsOther","Describe the beds",{showIf:h=>h.Beds==="Other"}),
-  T("Bathrooms","How many bathrooms, and how many people share each?",{placeholder:"2 bathrooms, 4 people each."}),
+  T("Bathrooms","How many people share each bathroom?",{placeholder:"4 people each."}),
   R("BathShared","Are bathrooms shared between genders?",YN),
   T("Kitchen","Is there a kitchen? What is in it?",{placeholder:"Full kitchen with stove, fridge, microwave.",showIf:h=>h.HType!=="Motel or hotel rooms"}),
   R("HotPlate","Can participants have a hot plate or air fryer in their room?",YN,{showIf:h=>h.HType==="Motel or hotel rooms"}),
@@ -470,10 +476,15 @@ const HOUSING_FIELDS = [
   TA("RentDue","When is rent due, and what is the policy for late payment?",{help:"Tell participants the rent terms, and what happens if they pay late, before they accept the housing."}),
   T("DepositAmount","Deposit amount",{type:"number",step:"0.01",money:true}),
   { type:"row", fields:[ T("DepositDue","Deposit due date",{placeholder:"On arrival."}), T("DepositTerms","Deposit refund terms",{placeholder:"A $50 cleaning fee is deducted at move out."}) ]},
+  TA("DepositHow","How do participants pay the deposit?",{placeholder:"Cash or money order at the office on move in day, or deducted from the first two paychecks.",sumLabel:"Instructions for deposit payment"}),
   { key:"Included", type:"checks", label:"What is included with the housing? Check all that apply.", sumLabel:"Included with housing", choices:["Kitchen with cookware","Sheets","Pillow","Blanket","Towels","Wi-Fi","Electric","Water","Gas or heat","Air conditioning","Coin-operated washer","Coin-operated dryer","Free washer","Free dryer"] },
   R("LinenService","How often are linens changed or laundered?",["Weekly","Every two weeks","On request","Provided once at move in; participants launder them"],{showIf:h=>h.HType==="Motel or hotel rooms"}),
   T("Bring","What must participants bring or buy?",{placeholder:"Cleaning supplies, kitchen basics, a fan."}),
+  T("UtilEstimate","Estimated monthly cost of any utilities that are not included",{type:"number",step:"0.01",money:true,help:"Leave blank if everything is included."}),
   R("Mandatory","Is housing mandatory?",YN),
+  R("AltHousing","May participants arrange their own housing instead?",YN),
+  T("AltDeadline","How far before arrival must they tell you?",{placeholder:"Three weeks before arrival.",showIf:h=>h.AltHousing==="Yes",sumLabel:"Deadline to decline housing"}),
+  TA("HTransport","How do participants get from this housing to the work site? Include the cost, the time it takes, and the distance.",{placeholder:"A ten minute walk, about half a mile. Some sites are a 20 minute bus ride, $2 each way.",sumLabel:"Transportation from housing to work site"}),
   T("Guests","Are overnight guests allowed?",{placeholder:"With advance approval, no more than two nights."}),
   { type:"group", label:"Move in and move out", fields:[
     { type:"row", fields:[
@@ -487,7 +498,8 @@ const HOUSING_FIELDS = [
     { key:"ArrivalDays", type:"checks", label:"Which days can participants arrive? Check all that apply.", sumLabel:"Arrival days accepted", choices:DAYS, allLabel:"Any day" },
     TA("MoveNotes","Anything else about moving in or out?",{sumLabel:"Move in notes"})
   ]},
-  T("AfterTermination","If a participant is terminated or resigns, how long may they remain in housing?",{help:"CHI asks for a minimum of 48 hours so participants can make arrangements."})
+  T("AfterTermination","If a participant is terminated or resigns, how long may they remain in housing?",{help:"CHI asks for a minimum of 48 hours so participants can make arrangements."}),
+  TA("LeaveEarly","If a participant leaves before the end of their agreement term for any reason, what do they still owe and is the deposit refunded?",{placeholder:"Charged through the end of the week, deposit is not returned.",sumLabel:"If a participant leaves before the end of the agreement term"})
 ];
 const CERT_TITLE = t => /g[ua]{1,2}rd|swim|water\s*safety|pool\s*attendant|beach\s*patrol|aquatic/i.test(String(t||""));
 const POS_FIELDS = [
